@@ -1,0 +1,16 @@
+{
+  "name": "openlmis-eswatini-cmis-ui",
+  "version": "1.0.0-SNAPSHOT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clintonhealthaccess/eswatini-OpenLMIS-CMIS-UI"
+  },
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "openlmis-ui": "file:///dev-ui"
+  },
+  "scripts": {
+    "postinstall": "cp -nr node_modules/dev-ui/node_modules ."
+  },
+  "dependencies": {}
+}

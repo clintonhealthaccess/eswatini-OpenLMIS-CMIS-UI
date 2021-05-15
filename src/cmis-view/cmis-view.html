@@ -1,0 +1,12 @@
+<header>
+    <h2>{{'cmisView.hello' | message}}</h2>
+</header>
+
+<form id="cmis-form" ng-submit="vm.cmis.confirm()">
+    <div class="openlmis-table-container">
+    </div>
+</form>
+<div class="openlmis-toolbar button-group">
+    <button ng-click="vm.cmis.save()">{{'cmisView.save' | message}}</button>
+    <button type="submit" class="primary" form="cmis-form">{{'cmisView.confirm.label' | message}}</button>
+</div>
