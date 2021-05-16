@@ -13,6 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('proofOfDeliveryService', function() {
+describe('CmisServiceService', function() {
 
 });

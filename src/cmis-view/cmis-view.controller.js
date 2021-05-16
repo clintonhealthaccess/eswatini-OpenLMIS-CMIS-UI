@@ -28,10 +28,6 @@
         .module('cmis-view')
         .controller('CmisViewController', CmisViewController);
 
-    CmisViewController.$inject = [
-        'cmis'
-    ];
-
     function CmisViewController() {
 
         var vm = this;

@@ -18,17 +18,18 @@
     'use strict';
 
     /**
-     * @module pcmis-view
+     * @module cmis-view
      *
      * @description
      * Responsible for view cmis screen.
      */
     angular.module('cmis-view', [
+        'ngResource',
+        'ui.router',
         'cmis',
         'openlmis-i18n',
         'openlmis-date',
         'openlmis-pagination',
-        'ui.router',
         'openlmis-state-tracker'
     ]);
 })();

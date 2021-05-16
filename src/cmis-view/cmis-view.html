@@ -1,12 +1,53 @@
 <header>
-    <h2>{{'cmisView.hello' | message}}</h2>
+    <h2>{{'cmisView.header' | message}}</h2>
 </header>
 
-<form id="cmis-form" ng-submit="vm.cmis.confirm()">
-    <div class="openlmis-table-container">
-    </div>
+<form class="sidebar" ng-submit="vm.loadClients()">
+    <label for="client">{{'cmisView.client' | message}}</label>
+    <select id="client"
+            ng-model="vm.client"
+            ng-options="client.name for client in vm.clients"
+            required></select>
+    <input type="submit" value="{{'cmisView.search' | message}}" />
 </form>
+
+<section class="openlmis-table-container cmis-view">
+    <form ng-submit="vm.loadClients()" >
+        <label for="clientName">{{'cmisView.name' | message}}</label>
+        <select id="clientName"
+                ng-model="vm.clientName"
+                ng-options="client.name for client in vm.clients"></select>
+        <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
+    </form>
+    <table>
+        <caption ng-if="!vm.clients.length">{{'cmisView.noClientFound' | message}}</caption>
+        <thead>
+            <tr>
+                <th>{{'cmisView.clientId' | message}}</th>
+                <th>{{'cmisView.name' | message}}</th>
+                <th>{{'cmisView.status' | message}}</th>
+                <th class="col-sticky sticky-right">{{'cmisView.actions' | message}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="client in vm.clients">
+                <td>{{client.id}}</td>
+                <td>{{client.name}} - {{client.fullName}}</td>
+                <td>{{client.status}}</td>
+                <td>
+                    <button class="primary"
+                            ng-click="vm.createPrescription(client)">
+                        {{'cmisView.prescription'|message}}
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <openlmis-pagination/>
+</section>
+
+
 <div class="openlmis-toolbar button-group">
     <button ng-click="vm.cmis.save()">{{'cmisView.save' | message}}</button>
-    <button type="submit" class="primary" form="cmis-form">{{'cmisView.confirm.label' | message}}</button>
+    <button type="submit" class="primary" form="cmis-form">{{'cmisView.confirm' | message}}</button>
 </div>

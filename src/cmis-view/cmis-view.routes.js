@@ -26,7 +26,7 @@
         $stateProvider.state('openlmis.cmis.view', {
             isOffline: true,
             url: '/view',
-            label: 'cmis.view',
+            label: 'cmisView.view',
             priority: 2,
             showInNavigation: true,
             views: {
