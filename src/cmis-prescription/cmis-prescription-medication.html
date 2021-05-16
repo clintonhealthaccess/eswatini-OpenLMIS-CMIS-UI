@@ -1,0 +1,28 @@
+<h2>{{'cmisPrescription.medications' | message}}</h2>
+<section class="openlmis-table-container cmis-view">
+    <table>
+        <caption ng-if="!vm.clients.length">{{'cmisPrescription.noClientFound' | message}}</caption>
+        <thead>
+            <tr>
+                <th>{{'cmisPrescription.clientId' | message}}</th>
+                <th>{{'cmisPrescription.name' | message}}</th>
+                <th>{{'cmisPrescription.status' | message}}</th>
+                <th class="col-sticky sticky-right">{{'cmisPrescription.actions' | message}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="client in vm.clients">
+                <td>{{client.id}}</td>
+                <td>{{client.name}} - {{client.fullName}}</td>
+                <td>{{client.status}}</td>
+                <td>
+                    <button class="primary"
+                            ng-click="vm.createPrescription(client)">
+                        {{'cmisPrescription.prescription'|message}}
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <openlmis-pagination/>
+    </section>

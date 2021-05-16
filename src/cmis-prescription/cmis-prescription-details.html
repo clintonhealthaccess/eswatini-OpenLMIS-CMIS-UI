@@ -1,0 +1,20 @@
+<label for="prescriptionId">{{'cmisPrescription.id' | message}}</label>
+<input id="prescriptionId" type="text" ng-model="vm.prescription.id" ng-disabled required />
+
+<label for="date">{{'cmisPrescription.date' | message}}</label>
+<input id="date" type="date" ng-model="vm.prescription.date" ng-required="vm.prescription.id" />
+
+<label for="prescriber">{{'cmisPrescription.prescriber' | message}}</label>
+<input id="prescriber" type="text" ng-model="vm.prescription.prescriber" ng-disabled required />
+
+<label for="notes">{{'cmisPrescription.notes' | message}}</label>
+<textarea id="notes" ng-model="vm.prescription.notes"></textarea>
+
+<label for="dispenser">{{'cmisPrescription.dispenser' | message}}</label>
+<select id="dispenser" ng-model="vm.prescription.dispenser" ng-options="dispenser as dispenser.name for dispenser in vm.dispensers track by dispenser.id"></select>
+
+<label for="facilityCode">{{'cmisPrescription.facilityCode' | message}}</label>
+<input id="facilityCode" type="text" ng-model="vm.prescription.facilityCode" ng-disabled required />
+
+<label for="visitId">{{'cmisPrescription.visitId' | message}}</label>
+<input id="visitId" type="text" ng-model="vm.prescription.visitId" ng-disabled required />

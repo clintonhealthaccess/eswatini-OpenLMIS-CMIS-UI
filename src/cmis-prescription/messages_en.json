@@ -1,0 +1,11 @@
+{
+    "cmisPrescription.prescription": "Prescription",
+    "cmisPrescription.id": "Prescription ID",
+    "cmisPrescription.date": "Date",
+    "cmisPrescription.prescriber": "Prescriber",
+    "cmisPrescription.notes": "Notes",
+    "cmisPrescription.dispenser": "Dispenser",
+    "cmisPrescription.facilityCode": "Facility Code",
+    "cmisPrescription.visitId": "Visit ID",
+    "cmisPrescription.medications": "Medications"
+}

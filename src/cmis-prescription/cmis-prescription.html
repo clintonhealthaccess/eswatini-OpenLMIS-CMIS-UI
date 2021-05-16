@@ -1,0 +1,15 @@
+<h1>{{'cmisPrescription.prescription' | message}}</h1>
+
+<form id="add-prescription-form" ng-submit="vm.save()">
+    <div>
+        <ng-include src="'cmis-prescription/cmis-prescription-details.html'"></ng-include>
+    </div>
+    <div>
+        <ng-include src="'cmis-prescription/cmis-prescription-medication.html'"></ng-include>
+    </div>
+</form>
+
+<div class="openlmis-toolbar button-group">
+    <button id="cancel" ng-click="vm.goToPreviousState()">{{'cmisPrescription.cancel' | message}}</button>
+    <button class="primary" form="add-prescription-form">{{'cmisPrescription.save' | message}}</button>
+</div>

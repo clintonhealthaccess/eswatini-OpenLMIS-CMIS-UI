@@ -19,49 +19,30 @@
 
     /**
      * @ngdoc controller
-     * @name cmis-view.controller:CmisViewController
+     * @name cmis-prescription.controller:CmisPrescriptionController
      *
      * @description
-     * Controller that show CMIS integration view screen.
+     * Controller that show prescription view screen.
      */
     angular
-        .module('cmis-view')
-        .controller('CmisViewController', CmisViewController);
+        .module('cmis-prescription')
+        .controller('CmisPrescriptionController', CmisPrescriptionController);
 
-    CmisViewController.$inject = [
-        '$state'
-    ];
-
-    function CmisViewController($state) {
+    function CmisPrescriptionController() {
 
         var vm = this;
 
         vm.$onInit = onInit;
-        vm.createPrescription = createPrescription;
 
         /**
          * @ngdoc method
-         * @methodOf cmis-view.controller:CmisViewController
+         * @methodOf cmis-prescription.controller:CmisPrescriptionController
          * @name $onInit
          *
          * @description
-         * Initialization method of the CmisViewController.
+         * Initialization method of the CmisPrescriptionController.
          */
         function onInit() {
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf cmis-view.controller:CmisViewController
-         * @name createPrescription
-         *
-         * @description
-         * Creating new prescriptions
-         *
-         */
-        function createPrescription() {
-
-            $state.go('openlmis.cmis.prescription');
         }
     }
 }());
