@@ -1,0 +1,34 @@
+# version: 2
+# options:
+#   compose-file-path: 'docker-compose.yml'
+#   compose-dev-file-path: 'docker-compose-dev.yml'
+#   verbose: false
+#   cli_mode: 'auto'
+#   max_attempt: 5
+#   project_root: 'pwd'
+# syncs:
+#   olmis_sync:
+#     sync_strategy: 'unison'
+#     src: '.'
+#     sync_excludes: ['tmp/cache/**/*', '.git/**/*']
+
+# version: "2"
+
+# options:
+#   verbose: true
+# syncs:
+#   my-volume-sync:
+#     src: '.'
+
+
+version: "2"
+options:
+  verbose: true
+syncs:
+  olmis-sync: 
+    src: .
+    sync_host_ip: 'localhost'
+    sync_host_port: 10872
+    notify_terminal: true
+    sync_excludes: ['.git', '.idea', 'node_modules']
+sync_strategy: 'rsync'

@@ -1,0 +1,55 @@
+version: "2"
+services:
+  eswatini-cmis-ui:
+    image: openlmis/dev-ui:9.0.2-SNAPSHOT
+    ports:
+      - "9000:9000"
+      - "9876:9876"
+    working_dir: /app
+    volumes:
+      - olmis-sync:/app:nocopy
+    env_file: .env
+    volumes_from:
+      - auth-ui
+      - referencedata-ui
+      - stockmanagement-ui
+      - ui-components
+      - ui-layout
+      - cce-ui
+    depends_on:
+      - auth-ui
+      - referencedata-ui
+      - stockmanagement-ui
+      - ui-components
+      - ui-layout
+      - cce-ui
+  auth-ui:
+    image: openlmis/auth-ui:6.2.6-SNAPSHOT
+    volumes:
+      - '/openlmis-auth-ui'
+  referencedata-ui:
+    image: openlmis/referencedata-ui:5.6.5-SNAPSHOT
+    volumes:
+      - '/openlmis-referencedata-ui'
+  stockmanagement-ui:
+    image: openlmis/stockmanagement-ui:2.0.9-SNAPSHOT
+    volumes:
+     - '/openlmis-stockmanagement-ui'
+  ui-components:
+    image: openlmis/ui-components:7.2.5-SNAPSHOT
+    volumes:
+      - '/openlmis-ui-components'
+  ui-layout:
+    image: openlmis/ui-layout:5.1.9-SNAPSHOT
+    volumes:
+      - '/openlmis-ui-layout'
+  cce-ui:
+    image: openlmis/cce-ui:1.0.9-SNAPSHOT
+    volumes:
+      - '/openlmis-cce-ui'
+  image:
+    build: .
+    image: eswatini-cmis-ui
+volumes:
+  olmis-sync:
+    external: true
