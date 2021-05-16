@@ -12,15 +12,6 @@
 #     src: '.'
 #     sync_excludes: ['tmp/cache/**/*', '.git/**/*']
 
-# version: "2"
-
-# options:
-#   verbose: true
-# syncs:
-#   my-volume-sync:
-#     src: '.'
-
-
 version: "2"
 options:
   verbose: true
@@ -30,5 +21,5 @@ syncs:
     sync_host_ip: 'localhost'
     sync_host_port: 10872
     notify_terminal: true
-    sync_excludes: ['.git', '.idea', 'node_modules']
+    sync_excludes: ['.git', '.idea', 'node_modules', '.tmp/html/**/*', '.tmp/javascript/**/*']
 sync_strategy: 'rsync'
