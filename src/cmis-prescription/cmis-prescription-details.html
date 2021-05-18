@@ -1,20 +1,34 @@
-<label for="prescriptionId">{{'cmisPrescription.id' | message}}</label>
-<input id="prescriptionId" type="text" ng-model="vm.prescription.id" ng-disabled required />
+<fieldset class="form-group">
+    <label for="prescriptionId">{{'cmisPrescription.id' | message}}</label>
+    <input id="prescriptionId" type="text" ng-model="vm.prescription.id" ng-disabled required />
+</fieldset>
 
-<label for="date">{{'cmisPrescription.date' | message}}</label>
-<input id="date" type="date" ng-model="vm.prescription.date" ng-required="vm.prescription.id" />
+<fieldset class="form-group">
+    <label for="date">{{'cmisPrescription.date' | message}}</label>
+    <input id="date" type="date" ng-model="vm.prescription.date" ng-required="vm.prescription.id" />
+</fieldset>
 
-<label for="prescriber">{{'cmisPrescription.prescriber' | message}}</label>
-<input id="prescriber" type="text" ng-model="vm.prescription.prescriber" ng-disabled required />
+<fieldset class="form-group">
+    <label for="prescriber">{{'cmisPrescription.prescriber' | message}}</label>
+    <input id="prescriber" type="text" ng-model="vm.prescription.prescriber" ng-disabled required />
+</fieldset>
 
-<label for="notes">{{'cmisPrescription.notes' | message}}</label>
-<textarea id="notes" ng-model="vm.prescription.notes"></textarea>
+<fieldset class="form-group">
+    <label for="notes">{{'cmisPrescription.notes' | message}}</label>
+    <textarea id="notes" ng-model="vm.prescription.notes"></textarea>
+</fieldset>
 
-<label for="dispenser">{{'cmisPrescription.dispenser' | message}}</label>
-<select id="dispenser" ng-model="vm.prescription.dispenser" ng-options="dispenser as dispenser.name for dispenser in vm.dispensers track by dispenser.id"></select>
+<fieldset class="form-group">
+    <label for="dispenser">{{'cmisPrescription.dispenser' | message}}</label>
+    <select id="dispenser" ng-model="vm.prescription.dispenser" ng-options="dispenser as dispenser.name for dispenser in vm.dispensers track by dispenser.id"></select>
+</fieldset>
 
-<label for="facilityCode">{{'cmisPrescription.facilityCode' | message}}</label>
-<input id="facilityCode" type="text" ng-model="vm.prescription.facilityCode" ng-disabled required />
+<fieldset class="form-group">
+    <label for="facilityCode">{{'cmisPrescription.facilityCode' | message}}</label>
+    <input id="facilityCode" type="text" ng-model="vm.prescription.facilityCode" ng-disabled required />
+</fieldset>
 
-<label for="visitId">{{'cmisPrescription.visitId' | message}}</label>
-<input id="visitId" type="text" ng-model="vm.prescription.visitId" ng-disabled required />
+<fieldset class="form-group">
+    <label for="visitId">{{'cmisPrescription.visitId' | message}}</label>
+    <input id="visitId" type="text" ng-model="vm.prescription.visitId" ng-disabled required />
+</fieldset>

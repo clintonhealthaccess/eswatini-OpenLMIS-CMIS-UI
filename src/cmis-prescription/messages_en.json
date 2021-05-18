@@ -7,5 +7,12 @@
     "cmisPrescription.dispenser": "Dispenser",
     "cmisPrescription.facilityCode": "Facility Code",
     "cmisPrescription.visitId": "Visit ID",
-    "cmisPrescription.medications": "Medications"
+    "cmisPrescription.medications": "Medications",
+    "cmisPrescription.name": "Name",
+    "cmisPrescription.quantity": "Quantity",
+    "cmisPrescription.duration": "Duration/Days",
+    "cmisPrescription.substitute": "Substitute",
+    "cmisPrescription.cancel": "Cancel",
+    "cmisPrescription.dispense": "Dispense",
+    "cmisPrescription.noMedicationFound": "No Medication Found"
 }
