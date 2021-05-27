@@ -13,6 +13,10 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('CmisServiceService', function() {
+describe('CmisDispenseController', function() {
+
+    beforeEach(function() {
+        module('cmis-dispense');
+    });
 
 });

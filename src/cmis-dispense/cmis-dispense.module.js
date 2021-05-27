@@ -14,28 +14,22 @@
  */
 
 (function() {
+
     'use strict';
 
-    angular
-        .module('cmis-prescription')
-        .config(routes);
-
-    routes.$inject = ['$stateProvider'];
-
-    function routes($stateProvider) {
-        $stateProvider.state('openlmis.cmis.prescription', {
-            isOffline: true,
-            url: '/prescription',
-            label: 'cmisPrescription.prescription',
-            priority: 2,
-            showInNavigation: true,
-            views: {
-                '@openlmis': {
-                    controller: 'CmisPrescriptionController',
-                    controllerAs: 'vm',
-                    templateUrl: 'cmis-prescription/cmis-prescription.html'
-                }
-            }
-        });
-    }
+    /**
+     * @module cmis-dispense
+     *
+     * @description
+     * Responsible for view dispense screen.
+     */
+    angular.module('cmis-dispense', [
+        'ngResource',
+        'ui.router',
+        'cmis',
+        'openlmis-i18n',
+        'openlmis-date',
+        'openlmis-pagination',
+        'openlmis-state-tracker'
+    ]);
 })();

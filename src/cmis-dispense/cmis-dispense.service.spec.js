@@ -13,23 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-(function() {
+describe('CmisDispenseService', function() {
 
-    'use strict';
-
-    /**
-     * @module cmis-prescription
-     *
-     * @description
-     * Responsible for view prescription screen.
-     */
-    angular.module('cmis-prescription', [
-        'ngResource',
-        'ui.router',
-        'cmis',
-        'openlmis-i18n',
-        'openlmis-date',
-        'openlmis-pagination',
-        'openlmis-state-tracker'
-    ]);
-})();
+});

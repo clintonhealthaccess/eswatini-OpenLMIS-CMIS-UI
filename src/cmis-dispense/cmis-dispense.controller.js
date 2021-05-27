@@ -18,21 +18,36 @@
     'use strict';
 
     /**
-     * @ngdoc service
-     * @name cmis.CmisService
+     * @ngdoc controller
+     * @name cmis-dispense.controller:CmisDispenseController
      *
      * @description
-     * Application layer service that prepares domain objects to be used on the view.
+     * Controller that show dispense view screen.
      */
     angular
-        .module('cmis-prescription')
-        .service('CmisService', CmisService);
+        .module('cmis-dispense')
+        .controller('CmisDispenseController', CmisDispenseController);
 
-    CmisService.$inject = [
-        '$q'
-    ];
+    CmisDispenseController.$inject = ['CmisRequestService'];
 
-    function CmisService() {
+    function CmisDispenseController(CmisRequestService) {
+
+        var vm = this;
+        vm.$onInit = onInit;
+        this.login = CmisRequestService.oauth2AuthorizationCall;
+        this.isAuthorized = CmisRequestService.isUserAuthorized;
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name $onInit
+         *
+         * @description
+         * Initialization method of the CmisDispenseController.
+         */
+        function onInit() {
+
+            CmisRequestService.saveOath2Token();
+        }
     }
-
-})();
+}());

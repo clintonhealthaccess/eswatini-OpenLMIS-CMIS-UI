@@ -13,10 +13,26 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
-describe('CmisPrescriptionController', function() {
+(function() {
 
-    beforeEach(function() {
-        module('cmis-prescription');
-    });
+    'use strict';
 
-});
+    /**
+     * @ngdoc service
+     * @name cmis.CmisDispenseService
+     *
+     * @description
+     * Application layer service that prepares domain objects to be used on the view.
+     */
+    angular
+        .module('cmis-dispense')
+        .service('CmisDispenseService', CmisDispenseService);
+
+    CmisDispenseService.$inject = [
+        '$q'
+    ];
+
+    function CmisDispenseService() {
+    }
+
+})();

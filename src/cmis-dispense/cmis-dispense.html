@@ -1,0 +1,15 @@
+<h1>{{'cmisDispense.dispense' | message}}</h1>
+
+<form id="add-dispense-form" ng-submit="vm.save()">
+    <div>
+        <ng-include src="'cmis-dispense/cmis-dispense-details.html'"></ng-include>
+    </div>
+    <div>
+        <ng-include src="'cmis-dispense/cmis-dispense-medication.html'"></ng-include>
+    </div>
+</form>
+
+<div class="openlmis-toolbar button-group">
+    <button id="cancel" ng-click="vm.goToPreviousState()">{{'cmisDispense.cancel' | message}}</button>
+    <button class="primary" form="add-dispense-form">{{'cmisDispense.dispense' | message}}</button>
+</div>

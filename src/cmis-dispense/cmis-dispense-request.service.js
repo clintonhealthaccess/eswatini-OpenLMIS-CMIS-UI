@@ -25,7 +25,7 @@
      * to perscription API.
      */
     angular
-        .module('cmis-prescription')
+        .module('cmis-dispense')
         .service('CmisRequestService', CmisRequestService);
 
     CmisRequestService.$inject = ['$q', '$http'];

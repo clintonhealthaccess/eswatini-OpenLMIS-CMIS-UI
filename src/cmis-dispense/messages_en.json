@@ -1,0 +1,17 @@
+{
+    "cmisDispense.id": "Prescription ID",
+    "cmisDispense.date": "Date",
+    "cmisDispense.prescriber": "Prescriber",
+    "cmisDispense.notes": "Notes",
+    "cmisDispense.dispenser": "Dispenser",
+    "cmisDispense.facilityCode": "Facility Code",
+    "cmisDispense.visitId": "Visit ID",
+    "cmisDispense.medications": "Medications",
+    "cmisDispense.name": "Name",
+    "cmisDispense.quantity": "Quantity",
+    "cmisDispense.duration": "Duration/Days",
+    "cmisDispense.substitute": "Substitute",
+    "cmisDispense.cancel": "Cancel",
+    "cmisDispense.dispense": "Dispense",
+    "cmisDispense.noMedicationFound": "No Medication Found"
+}
