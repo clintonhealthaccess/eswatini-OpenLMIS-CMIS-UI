@@ -29,15 +29,17 @@
         .controller('CmisViewController', CmisViewController);
 
     CmisViewController.$inject = [
-        '$state'
+        '$state', 'CmisRequestService'
     ];
 
-    function CmisViewController($state) {
+    function CmisViewController($state, CmisRequestService) {
 
         var vm = this;
 
         vm.$onInit = onInit;
         vm.createPrescription = createPrescription;
+        vm.prescriptions = undefined;
+        vm.getPrescriptions = getPrescriptions;
 
         /**
          * @ngdoc method
@@ -48,6 +50,7 @@
          * Initialization method of the CmisViewController.
          */
         function onInit() {
+            vm.prescriptions = getPrescriptions();
         }
 
         /**
@@ -63,5 +66,22 @@
 
             $state.go('openlmis.cmis.prescription');
         }
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-view.controller:CmisViewController
+         * @name createPrescription
+         *
+         * @description
+         * Creating new prescriptions
+         *
+         */
+        function getPrescriptions() {
+            var data = CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
+                + '/PrescriptionService.svc/prescription/client/b2ba810e-9099-4ac4-bd2c-d3a86eb06439');
+            vm.prescriptions = JSON.parse(data);
+            console.log(vm.prescriptions);
+        }
+
     }
 }());

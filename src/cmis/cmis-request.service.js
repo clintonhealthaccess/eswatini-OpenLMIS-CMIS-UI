@@ -25,7 +25,7 @@
      * to perscription API.
      */
     angular
-        .module('cmis-dispense')
+        .module('cmis')
         .service('CmisRequestService', CmisRequestService);
 
     CmisRequestService.$inject = ['$q', '$http'];
@@ -68,20 +68,30 @@
          * @returns {Promise} Promise with GET request.
          */
         function doGet(url) {
-            var dataPromise = null;
-            var authHeader = buildRequestHeader();
-            if (authHeader !== null) {
-                dataPromise = $http.get(
-                    url
-                ).defaults.headers.common.Authentication = authHeader
-                    .then(function(response) {
-                        return response.data;
-                    })
-                    .catch(function() {
-                        return $q.reject();
-                    });
-            }
-            return dataPromise;
+            // var dataPromise = null;
+            // var authHeader = buildRequestHeader();
+            // if (authHeader !== null) {
+            //     dataPromise = $http.get(
+            //         url
+            //     ).defaults.headers.common.Authentication = authHeader
+            //         .then(function(response) {
+            //             return response.data;
+            //         })
+            //         .catch(function() {
+            //             return $q.reject();
+            //         });
+            // }
+            var data;
+            $http.get(
+                url
+            )
+                .then(function(response) {
+                    data = response.data;
+                })
+                .catch(function() {
+                    return $q.reject();
+                });
+            return data;
         }
 
         /**
