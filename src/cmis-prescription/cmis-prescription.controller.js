@@ -28,11 +28,14 @@
         .module('cmis-prescription')
         .controller('CmisPrescriptionController', CmisPrescriptionController);
 
-    function CmisPrescriptionController() {
+    CmisPrescriptionController.$inject = ['CmisRequestService'];
+
+    function CmisPrescriptionController(CmisRequestService) {
 
         var vm = this;
-
         vm.$onInit = onInit;
+        this.login = CmisRequestService.oauth2AuthorizationCall;
+        this.isAuthorized = CmisRequestService.isUserAuthorized;
 
         /**
          * @ngdoc method
@@ -43,6 +46,8 @@
          * Initialization method of the CmisPrescriptionController.
          */
         function onInit() {
+
+            CmisRequestService.saveOath2Token();
         }
     }
 }());
