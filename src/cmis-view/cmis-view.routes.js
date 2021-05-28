@@ -35,6 +35,14 @@
                     controllerAs: 'vm',
                     templateUrl: 'cmis-view/cmis-view.html'
                 }
+            },
+            resolve: {
+                facility: function(facilityFactory) {
+                    return facilityFactory.getUserHomeFacility();
+                },
+                user: function(authorizationService) {
+                    return authorizationService.getUser();
+                }
             }
         });
     }
