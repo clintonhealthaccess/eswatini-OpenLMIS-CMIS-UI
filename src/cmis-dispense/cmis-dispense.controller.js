@@ -29,10 +29,10 @@
         .controller('CmisDispenseController', CmisDispenseController);
 
     CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility', 'visit',
-        'stateTrackerService'];
+        'stateTrackerService', 'orderableGroups'];
 
     function CmisDispenseController(CmisRequestService, $stateParams, user, facility, visit,
-                                    stateTrackerService) {
+                                    stateTrackerService, orderableGroups) {
 
         var vm = this;
         vm.$onInit = onInit;
@@ -49,7 +49,7 @@
                 user
             ]
         };
-
+        vm.orderableGroups = orderableGroups;
         /**
          * @ngdoc method
          * @methodOf cmis-dispense.controller:CmisDispenseController

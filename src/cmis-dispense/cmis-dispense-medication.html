@@ -23,8 +23,13 @@
 </section>
 <fieldset class="form-group">
     <label for="substitute">{{'cmisDispense.substitute' | message}}</label>
-    <select id="substitute"
+    <!-- <select id="substitute"
             ng-model="vm.substitute"
             ng-options="substitute.name for substitute in vm.substitutes">
+    </select> -->
+    <select id="productSelect" ng-model="vm.selectedOrderableGroup"
+        ng-options="orderableGroup[0].orderable.fullProductName for orderableGroup in vm.orderableGroups"
+        ng-change="vm.orderableSelectionChanged()"
+        required>
     </select>
 </fieldset>

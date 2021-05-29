@@ -40,15 +40,35 @@
                 }
             },
             resolve: {
-                facility: function(facilityFactory) {
-                    return facilityFactory.getUserHomeFacility();
+                facility: function($stateParams, facilityFactory) {
+                    if (_.isUndefined($stateParams.facility)) {
+                        return facilityFactory.getUserHomeFacility();
+                    }
+                    return $stateParams.facility;
                 },
-                user: function(authorizationService) {
-                    return authorizationService.getUser();
+                user: function($stateParams, authorizationService) {
+                    if (_.isUndefined($stateParams.user)) {
+                        return authorizationService.getUser();
+                    }
+                    return $stateParams.user;
                 },
-                visit: function(CmisRequestService, $stateParams) {
-                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
-                    + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
+                program: function($stateParams, programService) {
+                    if (_.isUndefined($stateParams.program)) {
+                        return programService.get($stateParams.programId);
+                    }
+                    return $stateParams.program;
+                },
+                visit: function($stateParams, CmisRequestService) {
+                    if (_.isUndefined($stateParams.visit)) {
+                        return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
+                        + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
+                    }
+                    return $stateParams.visit;
+                },
+                orderableGroups: function($stateParams, program, facility, existingStockOrderableGroupsFactory) {
+                    return existingStockOrderableGroupsFactory
+                        .getGroups($stateParams, program, facility);
+                    // .getGroupsWithNotZeroSoh($stateParams, program, facility);
                 }
             }
         });
