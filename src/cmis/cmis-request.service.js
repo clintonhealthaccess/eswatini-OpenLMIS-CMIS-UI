@@ -81,17 +81,24 @@
             //             return $q.reject();
             //         });
             // }
-            var data;
-            $http.get(
+            // var data = {
+            //     data: null
+            // };
+            var dataPromise = $http.get(
                 url
             )
                 .then(function(response) {
-                    data = response.data;
+                    if (response.data.message === 'Wrong parameters or prescription expired') {
+                        return {
+                            data: {}
+                        };
+                    }
+                    return response.data;
                 })
                 .catch(function() {
                     return $q.reject();
                 });
-            return data;
+            return dataPromise;
         }
 
         /**

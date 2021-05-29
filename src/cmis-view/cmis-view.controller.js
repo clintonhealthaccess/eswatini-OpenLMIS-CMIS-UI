@@ -12,7 +12,7 @@
  * the GNU Affero General Public License along with this program. If not, see
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
-
+/* eslint-disable camelcase */
 (function() {
 
     'use strict';
@@ -29,17 +29,17 @@
         .controller('CmisViewController', CmisViewController);
 
     CmisViewController.$inject = [
-        '$state', 'facility', 'user', 'CmisRequestService', '$q'
+        '$state', 'facility', 'user', 'CmisRequestService', '$filter'
     ];
 
-    function CmisViewController($state, facility, user, CmisRequestService, $q) {
+    function CmisViewController($state, facility, user, CmisRequestService, $filter) {
 
         var vm = this;
 
         vm.$onInit = onInit;
-        vm.createPrescription = createPrescription;
-        vm.prescriptions = undefined;
-        vm.getPrescriptions = getPrescriptions;
+        vm.doDispense = doDispense;
+        vm.getVisits = getVisits;
+        vm.filterList = filterList;
 
         /**
          * @ngdoc property
@@ -74,7 +74,33 @@
         function onInit() {
             vm.user = user;
             vm.facility = facility;
-            vm.prescriptions = getPrescriptions();
+            vm.visits = getVisits();
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-view.controller:CmisViewController
+         * @name filter
+         *
+         * @description
+         * Filter search
+         *
+         */
+        function filterList() {
+            vm.visits = vm.cachedVisits;
+            if (vm.patientName) {
+                vm.visits = $filter('filter')(vm.visits, {
+                    first_name: vm.patientName
+                });
+            } else if (vm.patientLastName) {
+                vm.visits = $filter('filter')(vm.visits, {
+                    last_name: vm.patientLastName
+                });
+            } else if (vm.patientId) {
+                vm.visits = $filter('filter')(vm.visits, {
+                    patient_id: vm.patientId
+                });
+            }
         }
 
         /**
@@ -83,12 +109,12 @@
          * @name createPrescription
          *
          * @description
-         * Creating new prescriptions
+         * Creating new dispense
          *
          */
-        function createPrescription() {
+        function doDispense() {
 
-            $state.go('openlmis.cmis.prescription');
+            $state.go('openlmis.cmis.dispense');
         }
 
         /**
@@ -100,10 +126,17 @@
          * Get list of prescriptions
          *
          */
-        function getPrescriptions() {
-            var data = CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
-                + '/PrescriptionService.svc/prescription/client/b2ba810e-9099-4ac4-bd2c-d3a86eb06439');
-            vm.prescriptions = $q.resolve(data);
+        function getVisits() {
+            vm.facility.code;
+            var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
+            + '/PrescriptionService.svc/prescription/clients/H002');
+
+            promise.then(
+                function(result) {
+                    vm.visits = result.data;
+                    vm.cachedVisits = result.data;
+                }
+            );
         }
     }
 }());
