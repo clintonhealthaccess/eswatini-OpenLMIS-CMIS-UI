@@ -1,25 +1,25 @@
 <h2>{{'cmisDispense.medications' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
-    <table>
-        <caption ng-if="!vm.clients.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
+    <table ng-repeat="prescription in vm.visit.prescriptions">
+        <caption ng-if="!vm.prescription.medications.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
         <thead>
             <tr>
                 <th></th>
                 <th>{{'cmisDispense.name' | message}}</th>
-                <th>{{'cmisDispense.quantity' | message}}</th>
+                <th>{{'cmisDispense.dose' | message}}</th>
                 <th>{{'cmisDispense.duration' | message}}</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="medication in vm.medications">
+            <tr ng-repeat="medication in prescription.medications">
                 <td><input id="assigned" type="checkbox" ng-model="medication.assigned"/></td>
-                <td>{{medication.name}}</td>
-                <td><input id="quantity" type="text" ng-model="medication.quantity"/></td>
+                <td>{{medication.drug_name}}</td>
+                <td><input id="dose" type="text" ng-model="medication.dose"/></td>
                 <td><input id="duration" type="text" ng-model="medication.duration"/></td>
             </tr>
         </tbody>
     </table>
-<openlmis-pagination/>
+<!-- <openlmis-pagination/> -->
 </section>
 <fieldset class="form-group">
     <label for="substitute">{{'cmisDispense.substitute' | message}}</label>

@@ -1,34 +1,34 @@
 <fieldset class="form-group">
-    <label for="dispenseId">{{'cmisDispense.id' | message}}</label>
-    <input id="dispenseId" type="text" ng-model="vm.dispense.id" ng-disabled required />
+    <label for="dispenseId">{{'cmisDispense.patientId' | message}}</label>
+    <input id="dispenseId" type="text" ng-model="vm.visit.patient_id" ng-disabled required />
 </fieldset>
 
 <fieldset class="form-group">
     <label for="date">{{'cmisDispense.date' | message}}</label>
-    <input id="date" type="date" ng-model="vm.dispense.date" ng-required="vm.dispense.id" />
+    <input id="date" type="date" ng-model="vm.date" ng-required="vm.dispense.id" />
 </fieldset>
 
 <fieldset class="form-group">
     <label for="prescriber">{{'cmisDispense.prescriber' | message}}</label>
-    <input id="prescriber" type="text" ng-model="vm.dispense.prescriber" ng-disabled required />
+    <input id="prescriber" type="text" ng-model="vm.user.username" ng-disabled required />
 </fieldset>
 
 <fieldset class="form-group">
     <label for="notes">{{'cmisDispense.notes' | message}}</label>
-    <textarea id="notes" ng-model="vm.dispense.notes"></textarea>
+    <textarea id="notes" ng-model="vm.notes"></textarea>
 </fieldset>
 
 <fieldset class="form-group">
     <label for="dispenser">{{'cmisDispense.dispenser' | message}}</label>
-    <select id="dispenser" ng-model="vm.dispense.dispenser" ng-options="dispenser as dispenser.name for dispenser in vm.dispensers track by dispenser.id"></select>
+    <select id="dispenser" ng-model="vm.dispense.dispenser" ng-options="dispenser as dispenser.username for dispenser in vm.dispensers.users track by dispenser.user_id"></select>
 </fieldset>
 
 <fieldset class="form-group">
     <label for="facilityCode">{{'cmisDispense.facilityCode' | message}}</label>
-    <input id="facilityCode" type="text" ng-model="vm.dispense.facilityCode" ng-disabled required />
+    <input id="facilityCode" type="text" ng-model="vm.facility.code" ng-disabled required />
 </fieldset>
 
 <fieldset class="form-group">
     <label for="visitId">{{'cmisDispense.visitId' | message}}</label>
-    <input id="visitId" type="text" ng-model="vm.dispense.visitId" ng-disabled required />
+    <input id="visitId" type="text" ng-model="vm.visitId" ng-disabled/>
 </fieldset>

@@ -28,6 +28,9 @@
             url: '/dispense',
             label: 'cmisDispense.dispense',
             priority: 2,
+            params: {
+                visitId: null
+            },
             showInNavigation: true,
             views: {
                 '@openlmis': {
@@ -35,7 +38,28 @@
                     controllerAs: 'vm',
                     templateUrl: 'cmis-dispense/cmis-dispense.html'
                 }
+            },
+            resolve: {
+                facility: function(facilityFactory) {
+                    return facilityFactory.getUserHomeFacility();
+                },
+                user: function(authorizationService) {
+                    return authorizationService.getUser();
+                }
             }
+            // resolve: {
+            //     visit: function(CmisRequestService, $stateParams) {
+            //         var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
+            //         + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
+
+            //         promise.then(
+            //             function(result) {
+            //                 // console.log(result.data);
+            //                 return result.data;
+            //             }
+            //         );
+            //     }
+            // }
         });
     }
 })();

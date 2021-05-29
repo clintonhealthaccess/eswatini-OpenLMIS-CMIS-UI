@@ -28,14 +28,22 @@
         .module('cmis-dispense')
         .controller('CmisDispenseController', CmisDispenseController);
 
-    CmisDispenseController.$inject = ['CmisRequestService'];
+    CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility'];
 
-    function CmisDispenseController(CmisRequestService) {
+    function CmisDispenseController(CmisRequestService, $stateParams, user, facility) {
 
         var vm = this;
         vm.$onInit = onInit;
         this.login = CmisRequestService.oauth2AuthorizationCall;
         this.isAuthorized = CmisRequestService.isUserAuthorized;
+        vm.visitId = $stateParams.visitId;
+        vm.user = user;
+        vm.facility = facility;
+        vm.dispensers = {
+            users: [
+                user
+            ]
+        };
 
         /**
          * @ngdoc method
@@ -46,8 +54,39 @@
          * Initialization method of the CmisDispenseController.
          */
         function onInit() {
-
             CmisRequestService.saveOath2Token();
+            vm.visit = loadVisitDetails(vm.visitId);
+        }
+
+        /**
+         * @ngdoc property
+         * @propertyOf cmis-dispense.controller:CmisDispenseController
+         * @name visit
+         * @type {Object}
+         *
+         * @description
+         * Holds visit.
+         */
+        vm.visit = undefined;
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name loadVisitDetails
+         *
+         * @description
+         * Get visit details.
+         *
+         */
+        function loadVisitDetails() {
+            var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
+            + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
+
+            promise.then(
+                function(result) {
+                    vm.visit = result.data;
+                }
+            );
         }
     }
 }());

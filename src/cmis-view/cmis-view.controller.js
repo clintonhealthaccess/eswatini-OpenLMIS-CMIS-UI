@@ -112,18 +112,20 @@
          * Creating new dispense
          *
          */
-        function doDispense() {
+        function doDispense(visitId) {
 
-            $state.go('openlmis.cmis.dispense');
+            $state.go('openlmis.cmis.dispense', {
+                visitId: visitId
+            });
         }
 
         /**
          * @ngdoc method
          * @methodOf cmis-view.controller:CmisViewController
-         * @name createPrescription
+         * @name getVisits
          *
          * @description
-         * Get list of prescriptions
+         * Get list of visits
          *
          */
         function getVisits() {

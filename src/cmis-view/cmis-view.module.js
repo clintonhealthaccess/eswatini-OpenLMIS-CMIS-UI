@@ -31,10 +31,7 @@
         'openlmis-date',
         'openlmis-pagination',
         'openlmis-state-tracker',
-        // 'stockmanagement',
-        // 'stock-program-util',
         'referencedata-facility',
         'referencedata-program'
-        // 'stock-adjustment'
     ]);
 })();

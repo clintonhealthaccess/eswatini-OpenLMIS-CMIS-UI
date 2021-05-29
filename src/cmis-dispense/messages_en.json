@@ -1,5 +1,5 @@
 {
-    "cmisDispense.id": "Prescription ID",
+    "cmisDispense.patientId": "Patient ID",
     "cmisDispense.date": "Date",
     "cmisDispense.prescriber": "Prescriber",
     "cmisDispense.notes": "Notes",
@@ -8,7 +8,7 @@
     "cmisDispense.visitId": "Visit ID",
     "cmisDispense.medications": "Medications",
     "cmisDispense.name": "Name",
-    "cmisDispense.quantity": "Quantity",
+    "cmisDispense.dose": "Dose",
     "cmisDispense.duration": "Duration/Days",
     "cmisDispense.substitute": "Substitute",
     "cmisDispense.cancel": "Cancel",
