@@ -31,7 +31,7 @@
             params: {
                 visitId: null
             },
-            showInNavigation: true,
+            showInNavigation: false,
             views: {
                 '@openlmis': {
                     controller: 'CmisDispenseController',
@@ -45,21 +45,12 @@
                 },
                 user: function(authorizationService) {
                     return authorizationService.getUser();
+                },
+                visit: function(CmisRequestService, $stateParams) {
+                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
+                    + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
                 }
             }
-            // resolve: {
-            //     visit: function(CmisRequestService, $stateParams) {
-            //         var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
-            //         + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
-
-            //         promise.then(
-            //             function(result) {
-            //                 // console.log(result.data);
-            //                 return result.data;
-            //             }
-            //         );
-            //     }
-            // }
         });
     }
 })();

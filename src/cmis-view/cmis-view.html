@@ -21,7 +21,7 @@
         <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
     </form>
     <table>
-        <caption ng-if="!vm.visits">{{'cmisView.noClientFound' | message}}</caption>
+        <caption ng-if="!vm.clients">{{'cmisView.noClientFound' | message}}</caption>
         <thead>
             <tr>
                 <th>{{'cmisView.clientId' | message}}</th>
@@ -31,13 +31,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="visit in vm.visits">
-                <td>{{visit.client_id}}</td>
-                <td>{{visit.first_name}} {{visit.middle_name}} {{visit.last_name}}</td>
-                <td>{{visit.patient_id}}</td>
+            <tr ng-repeat="client in vm.clients">
+                <td>{{client.client_id}}</td>
+                <td>{{client.first_name}} {{client.middle_name}} {{client.last_name}}</td>
+                <td>{{client.patient_id}}</td>
                 <td>
                     <button class="primary"
-                            ng-click="vm.doDispense(visit.visit_id)">
+                            ng-click="vm.doDispense(client.visit_id)">
                         {{'cmisView.dispense'|message}}
                     </button>
                 </td>
@@ -45,7 +45,7 @@
         </tbody>
     </table>
     <!-- <openlmis-pagination
-        list="vm.visits"
+        list="vm.clients"
         paged-list="vm.rolesPage">
     <openlmis-pagination/> -->
 </section>

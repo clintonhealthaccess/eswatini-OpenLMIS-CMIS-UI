@@ -42,6 +42,11 @@
                 },
                 user: function(authorizationService) {
                     return authorizationService.getUser();
+                },
+                clients: function(CmisRequestService, facility) {
+                    console.log(facility.code);
+                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
+                    + '/PrescriptionService.svc/prescription/clients/H002');
                 }
             }
         });

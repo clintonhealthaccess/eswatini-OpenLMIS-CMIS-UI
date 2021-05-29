@@ -1,7 +1,7 @@
 <h2>{{'cmisDispense.medications' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
     <table ng-repeat="prescription in vm.visit.prescriptions">
-        <caption ng-if="!vm.prescription.medications.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
+        <caption ng-if="!prescription.medications.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
         <thead>
             <tr>
                 <th></th>

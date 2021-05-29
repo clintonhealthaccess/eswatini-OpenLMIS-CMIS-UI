@@ -29,17 +29,18 @@
         .controller('CmisViewController', CmisViewController);
 
     CmisViewController.$inject = [
-        '$state', 'facility', 'user', 'CmisRequestService', '$filter'
+        '$state', 'facility', 'user', 'clients', '$filter'
     ];
 
-    function CmisViewController($state, facility, user, CmisRequestService, $filter) {
+    function CmisViewController($state, facility, user, clients, $filter) {
 
         var vm = this;
 
         vm.$onInit = onInit;
         vm.doDispense = doDispense;
-        vm.getVisits = getVisits;
         vm.filterList = filterList;
+        vm.clients = clients.data;
+        vm.cachedClients = clients.data;
 
         /**
          * @ngdoc property
@@ -74,7 +75,6 @@
         function onInit() {
             vm.user = user;
             vm.facility = facility;
-            vm.visits = getVisits();
         }
 
         /**
@@ -87,17 +87,17 @@
          *
          */
         function filterList() {
-            vm.visits = vm.cachedVisits;
+            vm.clients = vm.cachedClients;
             if (vm.patientName) {
-                vm.visits = $filter('filter')(vm.visits, {
+                vm.clients = $filter('filter')(vm.clients, {
                     first_name: vm.patientName
                 });
             } else if (vm.patientLastName) {
-                vm.visits = $filter('filter')(vm.visits, {
+                vm.clients = $filter('filter')(vm.clients, {
                     last_name: vm.patientLastName
                 });
             } else if (vm.patientId) {
-                vm.visits = $filter('filter')(vm.visits, {
+                vm.clients = $filter('filter')(vm.clients, {
                     patient_id: vm.patientId
                 });
             }
@@ -119,26 +119,5 @@
             });
         }
 
-        /**
-         * @ngdoc method
-         * @methodOf cmis-view.controller:CmisViewController
-         * @name getVisits
-         *
-         * @description
-         * Get list of visits
-         *
-         */
-        function getVisits() {
-            vm.facility.code;
-            var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
-            + '/PrescriptionService.svc/prescription/clients/H002');
-
-            promise.then(
-                function(result) {
-                    vm.visits = result.data;
-                    vm.cachedVisits = result.data;
-                }
-            );
-        }
     }
 }());

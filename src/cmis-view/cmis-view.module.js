@@ -26,12 +26,21 @@
     angular.module('cmis-view', [
         'ngResource',
         'ui.router',
-        'cmis',
+        // 'cmis',
+        // 'openlmis-i18n',
+        // 'openlmis-date',
+        // 'openlmis-pagination',
+        // 'openlmis-state-tracker',
+        // 'referencedata-facility',
+        // 'referencedata-program',
+        'openlmis-urls',
+        'openlmis-auth',
         'openlmis-i18n',
-        'openlmis-date',
+        'openlmis-modal',
+        'openlmis-table',
         'openlmis-pagination',
-        'openlmis-state-tracker',
-        'referencedata-facility',
-        'referencedata-program'
+        'openlmis-rights',
+        'openlmis-date',
+        'openlmis-main-state'
     ]);
 })();

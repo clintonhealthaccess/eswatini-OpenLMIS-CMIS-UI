@@ -28,17 +28,22 @@
         .module('cmis-dispense')
         .controller('CmisDispenseController', CmisDispenseController);
 
-    CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility'];
+    CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility', 'visit',
+        'stateTrackerService'];
 
-    function CmisDispenseController(CmisRequestService, $stateParams, user, facility) {
+    function CmisDispenseController(CmisRequestService, $stateParams, user, facility, visit,
+                                    stateTrackerService) {
 
         var vm = this;
         vm.$onInit = onInit;
         this.login = CmisRequestService.oauth2AuthorizationCall;
         this.isAuthorized = CmisRequestService.isUserAuthorized;
+
+        vm.goToPreviousState = stateTrackerService.goToPreviousState;
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
+        vm.visit = visit.data;
         vm.dispensers = {
             users: [
                 user
@@ -55,38 +60,6 @@
          */
         function onInit() {
             CmisRequestService.saveOath2Token();
-            vm.visit = loadVisitDetails(vm.visitId);
-        }
-
-        /**
-         * @ngdoc property
-         * @propertyOf cmis-dispense.controller:CmisDispenseController
-         * @name visit
-         * @type {Object}
-         *
-         * @description
-         * Holds visit.
-         */
-        vm.visit = undefined;
-
-        /**
-         * @ngdoc method
-         * @methodOf cmis-dispense.controller:CmisDispenseController
-         * @name loadVisitDetails
-         *
-         * @description
-         * Get visit details.
-         *
-         */
-        function loadVisitDetails() {
-            var promise = CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
-            + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
-
-            promise.then(
-                function(result) {
-                    vm.visit = result.data;
-                }
-            );
         }
     }
 }());
