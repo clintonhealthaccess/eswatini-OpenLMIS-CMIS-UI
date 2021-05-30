@@ -52,24 +52,25 @@
                     }
                     return $stateParams.user;
                 },
-                program: function($stateParams, programService) {
-                    if (_.isUndefined($stateParams.program)) {
-                        return programService.get($stateParams.programId);
-                    }
-                    return $stateParams.program;
-                },
+                // program: function($stateParams, programService) {
+                //     if (_.isUndefined($stateParams.program)) {
+                //         return programService.get($stateParams.programId);
+                //     }
+                //     return $stateParams.program;
+                // },
                 visit: function($stateParams, CmisRequestService) {
+                    console.log($stateParams);
                     if (_.isUndefined($stateParams.visit)) {
-                        return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
-                        + '.com:8080/PrescriptionService.svc/prescription/client/' + $stateParams.visitId);
+                        return CmisRequestService.getRequest('https://mocki.io/v1/'
+                        + 'ad6270b8-8546-4217-ad16-2c457dd46ace');
                     }
                     return $stateParams.visit;
-                },
-                orderableGroups: function($stateParams, program, facility, existingStockOrderableGroupsFactory) {
-                    return existingStockOrderableGroupsFactory
-                        .getGroups($stateParams, program, facility);
-                    // .getGroupsWithNotZeroSoh($stateParams, program, facility);
                 }
+                // orderableGroups: function($stateParams, program, facility, existingStockOrderableGroupsFactory) {
+                //     return existingStockOrderableGroupsFactory
+                //         .getGroups($stateParams, program, facility);
+                //     // .getGroupsWithNotZeroSoh($stateParams, program, facility);
+                // }
             }
         });
     }

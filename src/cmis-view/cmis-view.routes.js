@@ -45,8 +45,8 @@
                 },
                 clients: function(CmisRequestService, facility) {
                     console.log(facility.code);
-                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems.com:8080'
-                    + '/PrescriptionService.svc/prescription/clients/H002');
+                    return CmisRequestService.getRequest('https://mocki.io/v1/'
+                    + '07273fee-6867-4fc1-b41d-851b2e31fd5d');
                 }
             }
         });
