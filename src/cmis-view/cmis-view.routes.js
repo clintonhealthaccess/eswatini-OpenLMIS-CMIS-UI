@@ -45,8 +45,8 @@
                 },
                 clients: function(CmisRequestService, facility) {
                     console.log(facility.code);
-                    return CmisRequestService.getRequest('https://mocki.io/v1/'
-                    + '07273fee-6867-4fc1-b41d-851b2e31fd5d');
+                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
+                    + '.com:8080/PrescriptionService.svc/prescription/client/b2ba810e-9099-4ac4-bd2c-d3a86eb06439');
                 }
             }
         });

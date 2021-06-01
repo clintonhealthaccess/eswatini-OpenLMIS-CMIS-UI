@@ -18,29 +18,14 @@
     'use strict';
 
     /**
-     * @module cmis-view
+     * @module openlmis-state-change-error
      *
      * @description
-     * Responsible for view cmis screen.
+     * Responsible for managing state change errors.
      */
-    angular.module('cmis-view', [
-        'ngResource',
+    angular.module('openlmis-state-change-error', [
         'ui.router',
-        // 'cmis',
-        // 'openlmis-i18n',
-        // 'openlmis-date',
-        // 'openlmis-pagination',
-        // 'openlmis-state-tracker',
-        'referencedata-facility',
-        'referencedata-program',
-        'openlmis-urls',
-        'openlmis-auth',
-        'openlmis-i18n',
-        'openlmis-modal',
-        'openlmis-table',
-        'openlmis-pagination',
-        'openlmis-rights',
-        'openlmis-date',
-        'openlmis-main-state'
+        'openlmis-modal'
     ]);
+
 })();
