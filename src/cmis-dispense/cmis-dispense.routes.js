@@ -52,19 +52,17 @@
                     }
                     return $stateParams.user;
                 },
-                // program: function($stateParams, programService) {
-                //     if (_.isUndefined($stateParams.program)) {
-                //         return programService.get($stateParams.programId);
-                //     }
-                //     return $stateParams.program;
-                // },
                 visit: function($stateParams, CmisRequestService) {
-                    console.log($stateParams);
                     if (_.isUndefined($stateParams.visit)) {
                         return CmisRequestService.getRequest('https://mocki.io/v1/'
-                        + 'ad6270b8-8546-4217-ad16-2c457dd46ace');
+                        + '34c6bbeb-b7b6-48bf-950f-56402a5930cc');
                     }
                     return $stateParams.visit;
+                },
+                summaries: function(facility, orderableGroupService) {
+                    return orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
+                        facility.supportedPrograms[0].id, facility.id, true
+                    );
                 }
                 // orderableGroups: function($stateParams, program, facility, existingStockOrderableGroupsFactory) {
                 //     return existingStockOrderableGroupsFactory

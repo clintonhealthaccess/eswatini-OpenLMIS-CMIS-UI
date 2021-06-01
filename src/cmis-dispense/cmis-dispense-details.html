@@ -9,18 +9,13 @@
 </fieldset>
 
 <fieldset class="form-group">
-    <label for="prescriber">{{'cmisDispense.prescriber' | message}}</label>
-    <input id="prescriber" type="text" ng-model="vm.user.username"  required />
-</fieldset>
-
-<fieldset class="form-group">
     <label for="notes">{{'cmisDispense.notes' | message}}</label>
     <textarea id="notes" ng-model="vm.notes"></textarea>
 </fieldset>
 
 <fieldset class="form-group">
     <label for="dispenser">{{'cmisDispense.dispenser' | message}}</label>
-    <select id="dispenser" ng-model="vm.dispense.dispenser" required ng-options="dispenser as dispenser.username for dispenser in vm.dispensers.users track by dispenser.user_id"></select>
+    <input id="dispenser" type="text" ng-model="vm.user.username" ng-disabled="true" />
 </fieldset>
 
 <fieldset class="form-group">

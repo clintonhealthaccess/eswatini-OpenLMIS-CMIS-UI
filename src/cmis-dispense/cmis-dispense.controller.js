@@ -29,10 +29,10 @@
         .controller('CmisDispenseController', CmisDispenseController);
 
     CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility', 'visit',
-        'stateTrackerService'];
+        'stateTrackerService', 'orderableGroupService', 'summaries', '$filter'];
 
     function CmisDispenseController(CmisRequestService, $stateParams, user, facility, visit,
-                                    stateTrackerService) {
+                                    stateTrackerService, orderableGroupService, summaries, $filter) {
 
         var vm = this;
         vm.$onInit = onInit;
@@ -40,15 +40,16 @@
         this.isAuthorized = CmisRequestService.isUserAuthorized;
 
         vm.goToPreviousState = stateTrackerService.goToPreviousState;
+        vm.getOrderablesGroups = getOrderablesGroups;
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
+        vm.programs = vm.facility.supportedPrograms;
+        vm.program = vm.programs[0];
         vm.visit = visit.data;
-        vm.dispensers = {
-            users: [
-                user
-            ]
-        };
+        vm.getSoH = getSoH;
+        vm.summaries = summaries;
+
         // vm.orderableGroups = orderableGroups;
         /**
          * @ngdoc method
@@ -60,6 +61,51 @@
          */
         function onInit() {
             CmisRequestService.saveOath2Token();
+            vm.orderableGroups = getOrderablesGroups();
+            vm.date = Date();
+            calculateMedications();
+
         }
+
+        // function getOrderablesGroups() {
+        //     vm.programs.forEach(function(program) {
+        //         existingStockOrderableGroupsFactory.getGroups($stateParams, program, facility)
+        //             .then(function(response) {
+        //                 vm.orderableGroups.push(response);
+        //             });
+        //         })
+        //     // .getGroupsWithNotZeroSoh($stateParams, program, facility);
+        // }
+
+        function getOrderablesGroups() {
+            orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
+                vm.program.id, vm.facility.id, true
+            ).then(function(response) {
+                vm.orderableGroups = response;
+            });
+        }
+
+        function calculateMedications() {
+            vm.visit.prescriptions.forEach(function(prescription) {
+                prescription.medications.forEach(function(medication) {
+                    medication.soh = getSoH('C100');
+                    medication.balance = calculateInterval(medication);
+                });
+            });
+        }
+
+        function getSoH(code) {
+            var orderable = $filter('filter')(vm.summaries, {
+                orderable: {
+                    productCode: code
+                }
+            });
+            return orderable[0][0].stockOnHand;
+        }
+
+        function calculateInterval(medication) {
+            return medication.soh - (medication.dose  * medication.duration);
+        }
+
     }
 }());

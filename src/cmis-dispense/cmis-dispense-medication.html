@@ -8,28 +8,64 @@
                 <th>{{'cmisDispense.name' | message}}</th>
                 <th>{{'cmisDispense.dose' | message}}</th>
                 <th>{{'cmisDispense.duration' | message}}</th>
+                <th>{{'cmisDispense.interval' | message}}</th>
+                <th>{{'cmisDispense.stockOnHand' | message}}</th>
+                <th>{{'cmisDispense.balance' | message}}</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="medication in prescription.medications">
                 <td><input id="assigned" type="checkbox" ng-model="medication.assigned"/></td>
                 <td>{{medication.drug_name}}</td>
-                <td><input id="dose" type="text" ng-model="medication.dose"/></td>
-                <td><input id="duration" type="text" ng-model="medication.duration"/></td>
+                <td>{{medication.dose}}</td>
+                <td>{{medication.duration}}</td>
+                <td>{{medication.interval}}</td>
+                <td>{{medication.soh}}</td>
+                <td>{{medication.balance}}</td>
             </tr>
         </tbody>
     </table>
 <!-- <openlmis-pagination/> -->
 </section>
-<fieldset class="form-group">
+
+<h2>{{'cmisDispense.substitute' | message}}</h2>
+<section class="openlmis-table-container cmis-view">
+    <table>
+        <caption ng-if="!vm.orderableGroups">{{'cmisDispense.noMedicationFound' | message}}</caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th>{{'cmisDispense.name' | message}}</th>
+                <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
+                <th>{{'cmisDispense.stockOnHand' | message}}</th>
+                <th>{{'cmisDispense.balance' | message}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="groups in vm.orderableGroups">
+                <td><input id="assigned" type="checkbox" ng-model="groups[0].assigned"/></td>
+                <td>{{groups[0].orderable.fullProductName}}</td>
+                <td><input id="dispenseQuantity" type="text" ng-model="groups[0].dispenseQuantity"/></td>
+                <td>{{groups[0].stockOnHand}}</td>
+                <td>{{groups[0].balance}}</td>
+            </tr>
+        </tbody>
+    </table>
+<!-- <openlmis-pagination/> -->
+</section>
+<!-- <fieldset class="form-group">
+    <label for="program">{{'cmisDispense.program' | message}}</label>
+    <select id="program"
+            ng-model="vm.program"
+            ng-change="vm.getOrderablesGroups()"
+            ng-options="program.name for program in vm.programs">
+    </select>
+</fieldset> -->
+<!-- <fieldset class="form-group">
     <label for="substitute">{{'cmisDispense.substitute' | message}}</label>
-    <!-- <select id="substitute"
-            ng-model="vm.substitute"
-            ng-options="substitute.name for substitute in vm.substitutes">
-    </select> -->
-    <select id="productSelect" ng-model="vm.selectedOrderableGroup"
+    <select id="productSelect" ng-model="vm.orderableGroups"
         ng-options="orderableGroup[0].orderable.fullProductName for orderableGroup in vm.orderableGroups"
         ng-change="vm.orderableSelectionChanged()"
         required>
     </select>
-</fieldset>
+</fieldset> -->

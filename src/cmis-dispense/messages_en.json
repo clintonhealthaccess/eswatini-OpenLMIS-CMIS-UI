@@ -13,5 +13,9 @@
     "cmisDispense.substitute": "Substitute",
     "cmisDispense.cancel": "Cancel",
     "cmisDispense.dispense": "Dispense",
-    "cmisDispense.noMedicationFound": "No Medication Found"
+    "cmisDispense.noMedicationFound": "No Medication Found",
+    "cmisDispense.stockOnHand": "Stock on Hand",
+    "cmisDispense.dispenseQuantity": "Quantity",
+    "cmisDispense.interval": "Interval",
+    "cmisDispense.balance": "Balance"
 }
