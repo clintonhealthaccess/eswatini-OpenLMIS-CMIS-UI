@@ -45,8 +45,8 @@
                 },
                 clients: function(CmisRequestService, facility) {
                     console.log(facility.code);
-                    return CmisRequestService.getRequest('http://cmis-dashboard.feisystems'
-                    + '.com:8080/PrescriptionService.svc/prescription/client/b2ba810e-9099-4ac4-bd2c-d3a86eb06439');
+                    return CmisRequestService.getRequest('https://eswantest.free.beeceptor.com/prescription/clients/' +
+                    facility.code);
                 }
             }
         });

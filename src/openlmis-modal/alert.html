@@ -1,0 +1,17 @@
+<div class="modal alert-modal {{vm.alertClass}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert-main">
+                    <div class="alert-message">
+                        <h2>{{vm.title | message}}</h2>
+                        <p>{{vm.message | message}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-click="vm.close()">{{vm.buttonLabel | message}}</button>
+            </div>
+        </div>
+    </div>
+</div>
