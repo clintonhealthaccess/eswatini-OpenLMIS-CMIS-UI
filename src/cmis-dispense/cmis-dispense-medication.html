@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="medication in prescription.medications">
-                <td><input id="assigned" type="checkbox" ng-model="medication.assigned"/></td>
+                <td><input id="assigned" type="checkbox" ng-model="medication.$selected"/></td>
                 <td>{{medication.drug_name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>

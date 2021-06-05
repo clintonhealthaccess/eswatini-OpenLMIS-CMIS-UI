@@ -118,6 +118,5 @@
                 visitId: visitId
             });
         }
-
     }
 }());

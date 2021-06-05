@@ -49,6 +49,7 @@
         vm.visit = visit.data;
         vm.getSoH = getSoH;
         vm.summaries = summaries;
+        vm.save = save;
 
         // vm.orderableGroups = orderableGroups;
         /**
@@ -105,6 +106,21 @@
 
         function calculateInterval(medication) {
             return medication.soh - (medication.dose  * medication.duration);
+        }
+
+        function save() {
+            var selectedMedicationsIds = [];
+
+            angular.forEach(vm.visit.prescriptions, function(prescription) {
+               angular.forEach(prescription.medications, function(medication) {
+                   console.log(medication.drug_id);
+                   if(medication.$selected) {
+                    console.log('PUSH ' + medication.drug_id);
+                       selectedMedicationsIds.push(medication);
+                   }
+               });
+            });
+
         }
 
     }
