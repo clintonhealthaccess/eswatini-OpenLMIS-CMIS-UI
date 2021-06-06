@@ -5,16 +5,15 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 (function() {
-
     'use strict';
 
     /**
@@ -28,12 +27,33 @@
         .module('cmis-dispense')
         .controller('CmisDispenseController', CmisDispenseController);
 
-    CmisDispenseController.$inject = ['CmisRequestService', '$stateParams', 'user', 'facility', 'visit',
-        'stateTrackerService', 'orderableGroupService', 'summaries', '$filter'];
+    CmisDispenseController.$inject = [
+        'CmisRequestService',
+        '$stateParams',
+        'user',
+        'facility',
+        'visit',
+        'stateTrackerService',
+        'orderableGroupService',
+        'summaries',
+        '$filter',
+        '$q',
+        'alertService'
+    ];
 
-    function CmisDispenseController(CmisRequestService, $stateParams, user, facility, visit,
-                                    stateTrackerService, orderableGroupService, summaries, $filter) {
-
+    function CmisDispenseController(
+        CmisRequestService,
+        $stateParams,
+        user,
+        facility,
+        visit,
+        stateTrackerService,
+        orderableGroupService,
+        summaries,
+        $filter,
+        $q,
+        alertService
+    ) {
         var vm = this;
         vm.$onInit = onInit;
         this.login = CmisRequestService.oauth2AuthorizationCall;
@@ -65,7 +85,6 @@
             vm.orderableGroups = getOrderablesGroups();
             vm.date = Date();
             calculateMedications();
-
         }
 
         // function getOrderablesGroups() {
@@ -79,11 +98,15 @@
         // }
 
         function getOrderablesGroups() {
-            orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
-                vm.program.id, vm.facility.id, true
-            ).then(function(response) {
-                vm.orderableGroups = response;
-            });
+            orderableGroupService
+                .findAvailableProductsAndCreateOrderableGroups(
+                    vm.program.id,
+                    vm.facility.id,
+                    true
+                )
+                .then(function(response) {
+                    vm.orderableGroups = response;
+                });
         }
 
         function calculateMedications() {
@@ -105,23 +128,33 @@
         }
 
         function calculateInterval(medication) {
-            return medication.soh - (medication.dose  * medication.duration);
+            return medication.soh - medication.dose * medication.duration;
         }
 
         function save() {
-            var selectedMedicationsIds = [];
-
+            var selectedMedications = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
-               angular.forEach(prescription.medications, function(medication) {
-                   console.log(medication.drug_id);
-                   if(medication.$selected) {
-                    console.log('PUSH ' + medication.drug_id);
-                       selectedMedicationsIds.push(medication);
-                   }
-               });
+                angular.forEach(
+                    prescription.medications,
+                    function(medication) {
+                        if (medication.$selected) {
+                            selectedMedications.push(medication);
+                        }
+                    }
+                );
             });
 
-        }
+            var dataToSend = {};
 
+            dataToSend.data = selectedMedications;
+            $q.resolve(
+                CmisRequestService.putRequest(
+                    'https://eswantest.free.beeceptor.com/prescription/client/dispense',
+                    dataToSend
+                )
+            ).then(function(response) {
+                alertService.success('Send successfull', response);
+            });
+        }
     }
-}());
+})();
