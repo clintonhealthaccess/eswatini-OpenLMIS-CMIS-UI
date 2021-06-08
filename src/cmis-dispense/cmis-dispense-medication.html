@@ -11,6 +11,7 @@
                 <th>{{'cmisDispense.interval' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
+                <th>Substitute</th>
             </tr>
         </thead>
         <tbody>
@@ -22,6 +23,7 @@
                 <td>{{medication.interval}}</td>
                 <td>{{medication.soh}}</td>
                 <td>{{medication.balance}}</td>
+                <td><input ng-attr-id="{{medication.drug_id}}" type="checkbox" ng-disabled="vm.disableMedications" ng-click="vm.lockMedications('med', medication.drug_id)"/></td>
             </tr>
         </tbody>
     </table>
@@ -39,6 +41,7 @@
                 <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
+                <th>Select substitute</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +51,7 @@
                 <td><input id="dispenseQuantity" type="text" ng-model="groups[0].dispenseQuantity"/></td>
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>{{groups[0].balance}}</td>
+                <td><input type="checkbox" ng-attr-id="{{groups[0].orderable.id}}" ng-disabled="vm.disableSubstitutes" ng-click="vm.lockMedications('sub', groups[0].orderable.id)"/></td>
             </tr>
         </tbody>
     </table>

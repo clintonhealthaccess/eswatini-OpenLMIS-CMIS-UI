@@ -58,6 +58,9 @@
         vm.$onInit = onInit;
         this.login = CmisRequestService.oauth2AuthorizationCall;
         this.isAuthorized = CmisRequestService.isUserAuthorized;
+        this.medicationsTmp = [];
+        this.substitutesTmp = [];
+        this.substitutesMap = new Map();
 
         vm.goToPreviousState = stateTrackerService.goToPreviousState;
         vm.getOrderablesGroups = getOrderablesGroups;
@@ -70,6 +73,9 @@
         vm.getSoH = getSoH;
         vm.summaries = summaries;
         vm.save = save;
+        vm.disableMedications = false;
+        vm.disableSubstitutes = true;
+        vm.lockMedications = lockMedications;
 
         // vm.orderableGroups = orderableGroups;
         /**
@@ -131,6 +137,42 @@
             return medication.soh - medication.dose * medication.duration;
         }
 
+        function lockMedications(type, id) {
+            this.disableMedications = !this.disableMedications;
+            this.disableSubstitutes = !this.disableSubstitutes;
+            var medLength = this.medicationsTmp.length;
+            var subLength = this.substitutesTmp.length;
+            if(type == 'med') {
+                if(medLength > subLength){
+                    this.substitutesMap =[];
+                    this.medicationsTmp =[];
+                    this.substitutesMap.clear();
+                } else if(medLength < subLength) {
+                    this.substitutesTmp.pop();
+                }else{
+                    this.medicationsTmp.push(id);
+                }
+                
+            }
+            if(type == 'sub') {
+                if(medLength > subLength){
+                    this.substitutesTmp.push(id);
+                } else if(medLength < subLength) {
+                    this.substitutesTmp.pop();
+                    this.substitutesMap.clear();
+                }else{
+                    this.medicationsTmp.push(id);
+                }
+                // map substitute to medication where medication is a key
+                if(this.medicationsTmp.length == 1 && this.substitutesTmp.length == 1) {
+                    this.substitutesMap.set(this.medicationsTmp.pop(), this.substitutesTmp.pop());
+                    this.substitutesMap =[];
+                    this.medicationsTmp =[];
+                }
+            }
+            console.log(this.substitutesMap);
+        }
+
         function save() {
             var selectedMedications = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
@@ -143,9 +185,7 @@
                     }
                 );
             });
-
             var dataToSend = {};
-
             dataToSend.data = selectedMedications;
             $q.resolve(
                 CmisRequestService.putRequest(
