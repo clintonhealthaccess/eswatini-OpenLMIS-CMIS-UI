@@ -2,30 +2,19 @@
     <h2>{{'cmisView.header' | message}}</h2>
 </header>
 <h3>Facility {{vm.facility.name}}</h3>
-<!-- <form class="sidebar" ng-submit="vm.getVisits()">
-    <label for="client">{{'cmisView.client' | message}}</label>
-    <select id="client"
-            ng-model="vm.client"
-            ng-options="client.name for client in vm.clients"
-            ></select>
-    <input type="submit" value="{{'cmisView.search' | message}}" />
-</form> -->
 <section class="openlmis-table-container cmis-view">
     <form ng-submit="vm.filterList()" >
-        <label for="patientName">{{'cmisView.name' | message}}</label>
-        <input type="text" id="patientName" ng-model="vm.patientName"/>
-        <label for="patientLastName">{{'cmisView.lastName' | message}}</label>
-        <input type="text" id="patientLastName" ng-model="vm.patientLastName"/>
+        <label for="patientClientId">{{'cmisView.clientId' | message}}</label>
+        <input type="text" id="patientLastName" ng-model="vm.patientClientId"/>
         <label for="patientId">{{'cmisView.patientId' | message}}</label>
         <input type="text" id="patientId" ng-model="vm.patientId"/>
         <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
     </form>
     <table>
-        <caption ng-if="!vm.clients">{{'cmisView.noClientFound' | message}}</caption>
+        <caption ng-if="!vm.clients.length">{{'cmisView.noClientFound' | message}}</caption>
         <thead>
             <tr>
                 <th>{{'cmisView.clientId' | message}}</th>
-                <th>{{'cmisView.name' | message}}</th>
                 <th>{{'cmisView.patientId' | message}}</th>
                 <th class="col-sticky sticky-right">{{'cmisView.actions' | message}}</th>
             </tr>
@@ -33,7 +22,6 @@
         <tbody>
             <tr ng-repeat="client in vm.clients">
                 <td>{{client.client_id}}</td>
-                <td>{{client.first_name}} {{client.middle_name}} {{client.last_name}}</td>
                 <td>{{client.patient_id}}</td>
                 <td>
                     <button class="primary"

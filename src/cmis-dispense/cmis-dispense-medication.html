@@ -1,6 +1,7 @@
 <h2>{{'cmisDispense.medications' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
     <table ng-repeat="prescription in vm.visit.prescriptions">
+        <h3>{{prescription.prescriber}}</h3>
         <caption ng-if="!prescription.medications.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
         <thead>
             <tr>
@@ -27,13 +28,12 @@
             </tr>
         </tbody>
     </table>
-<!-- <openlmis-pagination/> -->
 </section>
 
 <h2>{{'cmisDispense.substitute' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
     <table>
-        <caption ng-if="!vm.orderableGroups">{{'cmisDispense.noMedicationFound' | message}}</caption>
+        <caption ng-if="!vm.summaries">{{'cmisDispense.noSubstituteFound' | message}}</caption>
         <thead>
             <tr>
                 <th></th>
@@ -45,31 +45,31 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="groups in vm.orderableGroups">
+            <tr ng-repeat="groups in vm.summaries">
                 <td><input id="assigned" type="checkbox" ng-model="groups[0].assigned"/></td>
                 <td>{{groups[0].orderable.fullProductName}}</td>
-                <td><input id="dispenseQuantity" type="text" ng-model="groups[0].dispenseQuantity"/></td>
+                <td>
+                    <input
+                        id="dispenseQuantity"
+                        type="number"
+                        min="0"
+                        max="{{groups[0].stockOnHand}}"
+                        step="1"
+                        ng-model="groups[0].dispenseQuantity"/>
+                </td>
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>{{groups[0].balance}}</td>
+                <td>
+                    <input
+                        id="balance"
+                        type="text"
+                        ng-disabled="true"
+                        min="0"
+                        max="groups[0].stockOnHand"
+                        value="{{groups[0].balance = groups[0].stockOnHand - groups[0].dispenseQuantity}}"/>
+                </td>
                 <td><input type="checkbox" ng-attr-id="{{groups[0].orderable.id}}" ng-disabled="vm.disableSubstitutes" ng-click="vm.lockMedications('sub', groups[0].orderable.id)"/></td>
             </tr>
         </tbody>
     </table>
-<!-- <openlmis-pagination/> -->
 </section>
-<!-- <fieldset class="form-group">
-    <label for="program">{{'cmisDispense.program' | message}}</label>
-    <select id="program"
-            ng-model="vm.program"
-            ng-change="vm.getOrderablesGroups()"
-            ng-options="program.name for program in vm.programs">
-    </select>
-</fieldset> -->
-<!-- <fieldset class="form-group">
-    <label for="substitute">{{'cmisDispense.substitute' | message}}</label>
-    <select id="productSelect" ng-model="vm.orderableGroups"
-        ng-options="orderableGroup[0].orderable.fullProductName for orderableGroup in vm.orderableGroups"
-        ng-change="vm.orderableSelectionChanged()"
-        required>
-    </select>
-</fieldset> -->

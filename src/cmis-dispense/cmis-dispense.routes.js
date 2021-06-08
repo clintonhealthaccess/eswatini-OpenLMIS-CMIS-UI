@@ -54,8 +54,8 @@
                 },
                 visit: function($stateParams, CmisRequestService) {
                     if (_.isUndefined($stateParams.visit)) {
-                        return CmisRequestService.getRequest('https://mocki.io/v1/'
-                        + '34c6bbeb-b7b6-48bf-950f-56402a5930cc');
+                        return CmisRequestService.getRequest('/prescription/client/' + $stateParams.visitId);
+
                     }
                     return $stateParams.visit;
                 },
@@ -64,11 +64,6 @@
                         facility.supportedPrograms[0].id, facility.id, true
                     );
                 }
-                // orderableGroups: function($stateParams, program, facility, existingStockOrderableGroupsFactory) {
-                //     return existingStockOrderableGroupsFactory
-                //         .getGroups($stateParams, program, facility);
-                //     // .getGroupsWithNotZeroSoh($stateParams, program, facility);
-                // }
             }
         });
     }

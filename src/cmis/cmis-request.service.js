@@ -5,12 +5,12 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
 
 (function() {
@@ -26,9 +26,9 @@
      */
     angular.module('cmis').service('CmisRequestService', CmisRequestService);
 
-    CmisRequestService.$inject = ['$q', '$http'];
+    CmisRequestService.$inject = ['$q', '$http', 'cmisUrlFactory'];
 
-    function CmisRequestService($q, $http) {
+    function CmisRequestService($q, $http, cmisUrlFactory) {
         this.postRequest = doPost;
         this.getRequest = doGet;
         this.putRequest = doPut;
@@ -47,7 +47,7 @@
             var authHeader = buildRequestHeader();
             if (authHeader !== null) {
                 dataPromise = $http.post(
-                    url,
+                    cmisUrlFactory(url),
                     data
                 ).defaults.headers.common.Authentication = authHeader
                     .then(function(response) {
@@ -70,7 +70,7 @@
             // var authHeader = buildRequestHeader();
             // if (authHeader !== null) {
             //     dataPromise = $http.get(
-            //         url
+            //         cmisUrlFactory(url)
             //     ).defaults.headers.common.Authentication = authHeader
             //         .then(function(response) {
             //             return response.data;
@@ -83,7 +83,7 @@
             //     data: null
             // };
             var dataPromise = $http
-                .get(url)
+                .get(cmisUrlFactory(url))
                 .then(function(response) {
                     if (
                         response.data.message ===
@@ -110,7 +110,7 @@
         function doPut(url, data) {
             var dataPromise = null;
             dataPromise = $http
-                .post(url, data)
+                .post(cmisUrlFactory(url), data)
                 .then(function(response) {
                     return response.data;
                 })

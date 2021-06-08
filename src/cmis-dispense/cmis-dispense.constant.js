@@ -18,24 +18,31 @@
     'use strict';
 
     /**
-     * @module cmis-view
+     * @ngdoc object
+     * @name cmis-dispense.INTERVAL
      *
      * @description
-     * Responsible for view cmis screen.
+     * This is constant for intervals.
      */
-    angular.module('cmis-view', [
-        'ngResource',
-        'ui.router',
-        'referencedata-facility',
-        'referencedata-program',
-        'openlmis-urls',
-        'openlmis-auth',
-        'openlmis-i18n',
-        'openlmis-modal',
-        'openlmis-table',
-        'openlmis-pagination',
-        'openlmis-rights',
-        'openlmis-date',
-        'openlmis-main-state'
-    ]);
+    angular
+        .module('cmis-dispense')
+        .constant('INTERVAL', {
+            type: {
+                pm: 'SYS_ADMIN',
+                om: '1',
+                nocte: '1',
+                mn: '2',
+                mane: '1',
+                stat: 'SYS_ADMIN',
+                hr: '24',
+                wd: '5',
+                // '24h': '1',
+                // '1pm': '12',
+                od: '1',
+                bd: '2',
+                tid: '3',
+                qid: '4'
+            }
+        });
 })();
+

@@ -5,14 +5,13 @@
  * This program is free software: you can redistribute it and/or modify it under the terms
  * of the GNU Affero General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
-
 (function() {
     'use strict';
 
@@ -34,11 +33,11 @@
         'facility',
         'visit',
         'stateTrackerService',
-        'orderableGroupService',
         'summaries',
         '$filter',
         '$q',
-        'alertService'
+        'alertService',
+        'INTERVAL'
     ];
 
     function CmisDispenseController(
@@ -48,11 +47,11 @@
         facility,
         visit,
         stateTrackerService,
-        orderableGroupService,
         summaries,
         $filter,
         $q,
-        alertService
+        alertService,
+        INTERVAL
     ) {
         var vm = this;
         vm.$onInit = onInit;
@@ -63,7 +62,6 @@
         this.substitutesMap = new Map();
 
         vm.goToPreviousState = stateTrackerService.goToPreviousState;
-        vm.getOrderablesGroups = getOrderablesGroups;
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
@@ -77,7 +75,6 @@
         vm.disableSubstitutes = true;
         vm.lockMedications = lockMedications;
 
-        // vm.orderableGroups = orderableGroups;
         /**
          * @ngdoc method
          * @methodOf cmis-dispense.controller:CmisDispenseController
@@ -88,31 +85,8 @@
          */
         function onInit() {
             CmisRequestService.saveOath2Token();
-            vm.orderableGroups = getOrderablesGroups();
-            vm.date = Date();
+            vm.date = $filter('isoDate')(new Date());
             calculateMedications();
-        }
-
-        // function getOrderablesGroups() {
-        //     vm.programs.forEach(function(program) {
-        //         existingStockOrderableGroupsFactory.getGroups($stateParams, program, facility)
-        //             .then(function(response) {
-        //                 vm.orderableGroups.push(response);
-        //             });
-        //         })
-        //     // .getGroupsWithNotZeroSoh($stateParams, program, facility);
-        // }
-
-        function getOrderablesGroups() {
-            orderableGroupService
-                .findAvailableProductsAndCreateOrderableGroups(
-                    vm.program.id,
-                    vm.facility.id,
-                    true
-                )
-                .then(function(response) {
-                    vm.orderableGroups = response;
-                });
         }
 
         function calculateMedications() {
@@ -134,7 +108,7 @@
         }
 
         function calculateInterval(medication) {
-            return medication.soh - medication.dose * medication.duration;
+            return medication.soh - medication.dose * medication.duration * INTERVAL.type[medication.interval];
         }
 
         function lockMedications(type, id) {
@@ -189,7 +163,7 @@
             dataToSend.data = selectedMedications;
             $q.resolve(
                 CmisRequestService.putRequest(
-                    'https://eswantest.free.beeceptor.com/prescription/client/dispense',
+                    '/prescription/client/dispense',
                     dataToSend
                 )
             ).then(function(response) {

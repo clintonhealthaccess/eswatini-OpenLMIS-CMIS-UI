@@ -5,8 +5,6 @@
     "cmisView.view": "Integration",
     "cmisView.client": "Client",
     "cmisView.search": "Search",
-    "cmisView.name": "Name",
-    "cmisView.lastName": "Last name",
     "cmisView.noClientFound": "No clients found.",
     "cmisView.clientId": "Client ID",
     "cmisView.patientId": "Patient ID",

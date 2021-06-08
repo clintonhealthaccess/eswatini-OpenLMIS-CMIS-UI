@@ -28,9 +28,9 @@
         .module('cmis')
         .factory('cmisUrlFactory', factory);
 
-    factory.$inject = ['openlmisUrlFactory', 'pathFactory'];
+    factory.$inject = [];
 
-    function factory(openlmisUrlFactory, pathFactory) {
+    function factory() {
 
         var cmisUrl = '@@CMIS_SERVICE_URL';
 
@@ -50,8 +50,7 @@
      * @return {String}     cmis URL
      */
         return function(url) {
-            url = pathFactory(cmisUrl, url);
-            return openlmisUrlFactory(url);
+            return 'https://eswatini.free.beeceptor.com' + url;
         };
     }
 })();

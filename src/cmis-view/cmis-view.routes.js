@@ -44,8 +44,7 @@
                     return authorizationService.getUser();
                 },
                 clients: function(CmisRequestService, facility) {
-                    console.log(facility.code);
-                    return CmisRequestService.getRequest('https://eswantest.free.beeceptor.com/prescription/clients/' +
+                    return CmisRequestService.getRequest('/prescription/clients/' +
                     facility.code);
                 }
             }

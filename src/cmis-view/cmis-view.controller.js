@@ -88,13 +88,9 @@
          */
         function filterList() {
             vm.clients = vm.cachedClients;
-            if (vm.patientName) {
+            if (vm.patientClientId) {
                 vm.clients = $filter('filter')(vm.clients, {
-                    first_name: vm.patientName
-                });
-            } else if (vm.patientLastName) {
-                vm.clients = $filter('filter')(vm.clients, {
-                    last_name: vm.patientLastName
+                    client_id: vm.patientClientId
                 });
             } else if (vm.patientId) {
                 vm.clients = $filter('filter')(vm.clients, {
