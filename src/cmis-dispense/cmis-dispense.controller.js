@@ -153,7 +153,7 @@
                     dataToSend
                 )
             ).then(function(response) {
-                alertService.success('Send successfull', response);
+                alertService.success('Send successful', response);
             });
         }
     }
