@@ -1,7 +1,8 @@
 <h2>{{'cmisDispense.medications' | message}}</h2>
-<section class="openlmis-table-container cmis-view">
-    <table ng-repeat="prescription in vm.visit.prescriptions">
-        <h3>{{prescription.prescriber}}</h3>
+<section ng-repeat="prescription in vm.visit.prescriptions" class="openlmis-table-container cmis-view">
+    <h3>Prescriber</h3>
+    <h4>{{prescription.prescriber}}</h4>
+    <table>
         <caption ng-if="!prescription.medications.length">{{'cmisDispense.noMedicationFound' | message}}</caption>
         <thead>
             <tr>
@@ -36,7 +37,6 @@
         <caption ng-if="!vm.summaries">{{'cmisDispense.noSubstituteFound' | message}}</caption>
         <thead>
             <tr>
-                <th></th>
                 <th>{{'cmisDispense.name' | message}}</th>
                 <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
@@ -46,7 +46,6 @@
         </thead>
         <tbody>
             <tr ng-repeat="groups in vm.summaries">
-                <td><input id="assigned" type="checkbox" ng-model="groups[0].assigned"/></td>
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input
@@ -58,7 +57,6 @@
                         ng-model="groups[0].dispenseQuantity"/>
                 </td>
                 <td>{{groups[0].stockOnHand}}</td>
-                <td>{{groups[0].balance}}</td>
                 <td>
                     <input
                         id="balance"

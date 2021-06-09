@@ -28,16 +28,16 @@
         .module('cmis-dispense')
         .constant('INTERVAL', {
             type: {
-                pm: 'SYS_ADMIN',
+                pm: 'INPUT',
                 om: '1',
                 nocte: '1',
                 mn: '2',
                 mane: '1',
-                stat: 'SYS_ADMIN',
+                stat: 'INPUT',
                 hr: '24',
-                wd: '5',
+                wd: 'DIVIDE',
                 // '24h': '1',
-                // '1pm': '12',
+                // '1pm': 'DIVIDE',
                 od: '1',
                 bd: '2',
                 tid: '3',
