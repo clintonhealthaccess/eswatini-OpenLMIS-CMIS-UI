@@ -50,7 +50,7 @@
      * @return {String}     cmis URL
      */
         return function(url) {
-            return 'https://eswatini.free.beeceptor.com' + url;
+            return 'https://bbf27fdc-12d9-435d-9a93-17523086e4ff.mock.pstmn.io' + url;
         };
     }
 })();

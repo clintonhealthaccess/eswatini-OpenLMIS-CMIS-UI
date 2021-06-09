@@ -2,38 +2,40 @@
     <h2>{{'cmisView.header' | message}}</h2>
 </header>
 <h3>Facility {{vm.facility.name}}</h3>
-<section class="openlmis-table-container cmis-view">
-    <form ng-submit="vm.filterList()" >
-        <label for="patientClientId">{{'cmisView.clientId' | message}}</label>
-        <input type="text" id="patientLastName" ng-model="vm.patientClientId"/>
-        <label for="patientId">{{'cmisView.patientId' | message}}</label>
-        <input type="text" id="patientId" ng-model="vm.patientId"/>
-        <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
-    </form>
-    <table>
-        <caption ng-if="!vm.clients.length">{{'cmisView.noClientFound' | message}}</caption>
-        <thead>
-            <tr>
-                <th>{{'cmisView.clientId' | message}}</th>
-                <th>{{'cmisView.patientId' | message}}</th>
-                <th class="col-sticky sticky-right">{{'cmisView.actions' | message}}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="client in vm.clients">
-                <td>{{client.client_id}}</td>
-                <td>{{client.patient_id}}</td>
-                <td>
-                    <button class="primary"
-                            ng-click="vm.doDispense(client.visit_id)">
-                        {{'cmisView.dispense'|message}}
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- <openlmis-pagination
-        list="vm.clients"
-        paged-list="vm.rolesPage">
-    <openlmis-pagination/> -->
-</section>
+<div>
+    <section class="openlmis-table-container cmis-view">
+        <form ng-submit="vm.filterList()" >
+            <label for="patientClientId">{{'cmisView.clientId' | message}}</label>
+            <input type="text" id="patientLastName" ng-model="vm.patientClientId"/>
+            <label for="patientId">{{'cmisView.patientId' | message}}</label>
+            <input type="text" id="patientId" ng-model="vm.patientId"/>
+            <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
+        </form>
+        <table>
+            <caption ng-if="!vm.clients.length">{{'cmisView.noClientFound' | message}}</caption>
+            <thead>
+                <tr>
+                    <th>{{'cmisView.clientId' | message}}</th>
+                    <th>{{'cmisView.patientId' | message}}</th>
+                    <th class="col-sticky sticky-right">{{'cmisView.actions' | message}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="client in vm.clients">
+                    <td>{{client.client_id}}</td>
+                    <td>{{client.patient_id}}</td>
+                    <td>
+                        <button class="primary"
+                                ng-click="vm.doDispense(client.visit_id)">
+                            {{'cmisView.dispense'|message}}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- <openlmis-pagination
+            list="vm.clients"
+            paged-list="vm.rolesPage">
+        <openlmis-pagination/> -->
+    </section>
+</div>
