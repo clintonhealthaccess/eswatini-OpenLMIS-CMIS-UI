@@ -13,6 +13,7 @@
                 <th>{{'cmisDispense.interval' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
+                <th>{{'cmisDispense.substitute' | message}}</th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +25,11 @@
                 <td>{{medication.interval}}</td>
                 <td>{{medication.soh}}</td>
                 <td>{{medication.balance}}</td>
+                <td>
+                    <select name="substituteSelect" id="substituteSelect">
+                    <option ng-repeat="option in vm.substituteTab" value="{{option.orderable.fullProductName}}">{{option.orderable.fullProductName}}</option>
+                    </select>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -39,6 +45,8 @@
                 <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
+                <th></th>
+                <th>Add to substitutes</th>
             </tr>
         </thead>
         <tbody>
@@ -46,7 +54,7 @@
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input
-                        id="dispenseQuantity"
+                        id="dispenseQuantity{{$index}}"
                         type="number"
                         min="0"
                         max="{{groups[0].stockOnHand}}"
@@ -56,14 +64,14 @@
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>
                     <input
-                        id="balance"
+                        id="balance{{$index}}"
                         type="text"
                         ng-disabled="true"
                         min="0"
                         max="groups[0].stockOnHand"
                         value="{{groups[0].balance = groups[0].stockOnHand - groups[0].dispenseQuantity}}"/>
                 </td>
-                <td><input type="checkbox" ng-attr-id="{{groups[0].orderable.id}}" ng-disabled="vm.disableSubstitutes" ng-click="vm.lockMedications('sub', groups[0].orderable.id)"/></td>
+                <td><input type="checkbox" ng-attr-id="{{groups[0].orderable.id}}" ng-click="vm.addSubstitute(groups[0], this)" ng-model="groups[0].$selected"/></td>
             </tr>
         </tbody>
     </table>

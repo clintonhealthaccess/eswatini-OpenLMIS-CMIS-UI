@@ -67,7 +67,9 @@
         vm.visit = visit.data;
         vm.getSoH = getSoH;
         vm.summaries = summaries;
+        vm.addSubstitute = addSubstitute;
         vm.save = save;
+        vm.substituteTab = [];
 
         /**
          * @ngdoc method
@@ -103,6 +105,27 @@
 
         function calculateInterval(medication) {
             return medication.soh - medication.dose * medication.duration * INTERVAL.type[medication.interval];
+        }
+
+        function addSubstitute(substitute) {
+            if (substitute.$selected === true) {
+                vm.substituteTab.push(substitute);
+            } else {
+                deleteSubstitute(substitute);
+            }
+        }
+
+        function deleteSubstitute(substitute) {
+            for (var i = 0; i <= vm.substituteTab.length; i++) {
+                if (getProductName(substitute) === getProductName(vm.substituteTab[0])) {
+                    vm.substituteTab.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        function getProductName(item) {
+            return item.orderable.fullProductName;
         }
 
         function save() {
