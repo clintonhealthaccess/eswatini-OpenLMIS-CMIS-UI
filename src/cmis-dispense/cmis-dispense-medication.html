@@ -25,8 +25,9 @@
                 <td>{{medication.soh}}</td>
                 <td>{{medication.balance}}</td>
                 <td>
-                    <select name="substituteSelect" id="substituteSelect">
-                    <option ng-repeat="option in vm.substituteTab" value="{{option.orderable.fullProductName}}">{{option.orderable.fullProductName}}</option>
+                    <select id="substituteSelect"
+                        ng-model="medication.substitute"
+                        ng-options="option.orderable.fullProductName for option in vm.substituteTab">
                     </select>
                 </td>
             </tr>
@@ -44,8 +45,7 @@
                 <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
-                <th></th>
-                <th>{{'cmisDispense.addSubstitute' | message}}/th>
+                <th>{{'cmisDispense.addSubstitute' | message}}</th>
             </tr>
         </thead>
         <tbody>
