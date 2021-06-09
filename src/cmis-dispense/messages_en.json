@@ -18,5 +18,6 @@
     "cmisDispense.stockOnHand": "Stock on Hand",
     "cmisDispense.dispenseQuantity": "Quantity",
     "cmisDispense.interval": "Interval",
-    "cmisDispense.balance": "Balance"
+    "cmisDispense.balance": "Balance",
+    "cmisDispense.addSubstitute": "Add to substitutes"
 }
