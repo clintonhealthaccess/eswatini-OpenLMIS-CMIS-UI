@@ -12,7 +12,7 @@
  * the GNU Affero General Public License along with this program. If not, see
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
-
+/* eslint-disable camelcase */
 (function() {
     'use strict';
 
@@ -35,6 +35,7 @@
         this.saveOath2Token = saveOath2Token;
         this.oauth2AuthorizationCall = oauth2AuthorizationCall;
         this.isUserAuthorized = isUserAuthorized;
+        this.cmisMedicationBilder = cmisMedicationBilder;
 
         /**
          *
@@ -110,7 +111,7 @@
         function doPut(url, data) {
             var dataPromise = null;
             dataPromise = $http
-                .post(cmisUrlFactory(url), data)
+                .put(cmisUrlFactory(url), data)
                 .then(function(response) {
                     return response.data;
                 })
@@ -207,6 +208,27 @@
                     'Bearer ' + isUserAuthorized().oauth.access_token;
             }
             return requestHeader;
+        }
+
+        /**
+         * @description
+         * Function builds medication json
+         * @param medication medication id
+         * @param quantity dispense quantity
+         * @param date dispense date
+         * @param reason dispense reason
+         * @param notes dispense notes
+         * @returns single medication json
+         */
+        function cmisMedicationBilder(medication, quantity, date, reason, notes) {
+            var medicationJson = {
+                medication_id: medication,
+                dispense_quantity: String(quantity),
+                dispense_date: date,
+                dispense_zero_reason: reason,
+                dispense_notes: notes
+            };
+            return medicationJson;
         }
     }
 })();

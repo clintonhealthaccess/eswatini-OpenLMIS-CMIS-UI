@@ -65,11 +65,17 @@
         vm.programs = vm.facility.supportedPrograms;
         vm.program = vm.programs[0];
         vm.visit = visit.data;
-        vm.getSoH = getSoH;
         vm.summaries = summaries;
+        vm.substituteTab = [];
+
+        vm.date = '';
+        vm.reason = '';
+        vm.notes = '';
+
         vm.addSubstitute = addSubstitute;
         vm.save = save;
-        vm.substituteTab = [];
+        vm.getSoH = getSoH;
+        vm.substituteSelected = substituteSelected;
 
         /**
          * @ngdoc method
@@ -111,6 +117,8 @@
             if (substitute.$selected === true) {
                 vm.substituteTab.push(substitute);
             } else {
+                substitute.dispenseQuantity = 0;
+                deleteSubstituteFromMedicaments(substitute, vm.visit.prescriptions);
                 deleteSubstitute(substitute);
             }
         }
@@ -124,19 +132,52 @@
             }
         }
 
+        function substituteSelected(substitute) {
+            //place for remove substitute from list when selected
+            console.log(substitute);
+        }
+
+        function deleteSubstituteFromMedicaments(substitute, prescriptions) {
+            angular.forEach(prescriptions, function(prescription) {
+                angular.forEach(prescription.medications, function(medication) {
+                    if (medication.substitute.orderable.id === substitute.orderable.id) {
+                        medication.substitute = null;
+                    }
+                });
+            });
+        }
+
         function getProductName(item) {
             return item.orderable.fullProductName;
         }
 
         function save() {
             var selectedMedications = [];
+            var substitutesTab = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
                 angular.forEach(
                     prescription.medications,
                     function(medication) {
+                        var medicationJson = {};
                         if (medication.$selected) {
-                            selectedMedications.push(medication);
+                            medicationJson = CmisRequestService.cmisMedicationBilder(
+                                medication.medication_id,
+                                medication.balance,
+                                vm.date,
+                                vm.reason,
+                                vm.notes
+                            );
+                        } else {
+                            medicationJson = CmisRequestService.cmisMedicationBilder(
+                                medication.medication_id,
+                                medication.substitute.dispenseQuantity,
+                                vm.date,
+                                vm.reason,
+                                vm.notes
+                            );
+                            substitutesTab.push(medication.substitute);
                         }
+                        selectedMedications.push(medicationJson);
                     }
                 );
             });
@@ -149,9 +190,15 @@
                     '/prescription/client/dispense',
                     dataToSend
                 )
-            ).then(function(response) {
-                alertService.success('Send successful', response);
-            });
+            ).then(function(cmisResponse) {
+                console.log(cmisResponse);
+                console.log(substitutesTab);
+                return cmisResponse;
+
+            })
+                .then(function(olmisResponse) {
+                    alertService.success('Send successful', olmisResponse);
+                });
         }
     }
 })();

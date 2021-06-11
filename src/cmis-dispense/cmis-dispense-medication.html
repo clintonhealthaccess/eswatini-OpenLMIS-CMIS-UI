@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="medication in prescription.medications">
-                <td><input id="assigned" type="checkbox" ng-model="medication.$selected"/></td>
+                <td><input id="assigned{{$index}}" type="checkbox" ng-model="medication.$selected" ng-init="medication.$selected=true"/></td>
                 <td>{{medication.drug_name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
@@ -25,10 +25,15 @@
                 <td>{{medication.soh}}</td>
                 <td>{{medication.balance}}</td>
                 <td>
-                    <select id="substituteSelect"
+                    <div ng-if="!medication.$selected">
+                    <select ng-disabled="medication.$selected" id="substituteSelect"
                         ng-model="medication.substitute"
-                        ng-options="option.orderable.fullProductName for option in vm.substituteTab">
+                        ng-options="option.orderable.fullProductName for option in vm.substituteTab"
+                        ng-click="vm.substituteSelected(option)"
+                        required ng-required="!medication.$selected">
+                        <option value="">Select substitute</option>
                     </select>
+                    </div>
                 </td>
             </tr>
         </tbody>
@@ -56,6 +61,7 @@
                         id="dispenseQuantity{{$index}}"
                         type="number"
                         min="0"
+                        ng-disabled="!groups[0].$selected"
                         max="{{groups[0].stockOnHand}}"
                         step="1"
                         ng-model="groups[0].dispenseQuantity"/>
