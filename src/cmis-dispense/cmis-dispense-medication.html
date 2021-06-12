@@ -17,7 +17,13 @@
         </thead>
         <tbody>
             <tr ng-repeat="medication in prescription.medications">
-                <td><input id="assigned{{$index}}" type="checkbox" ng-model="medication.$selected" ng-init="medication.$selected=true"/></td>
+                <td>
+                    <input
+                        id="assigned{{$index}}"
+                        type="checkbox"
+                        ng-model="medication.$selected"
+                        ng-change="vm.addOrRemoveMedication(medication)"/>
+                </td>
                 <td>{{medication.drug_name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
@@ -43,7 +49,7 @@
 <h2>{{'cmisDispense.substitute' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
     <table>
-        <caption ng-if="!vm.summaries">{{'cmisDispense.noSubstituteFound' | message}}</caption>
+        <caption ng-if="!vm.orderableGroup">{{'cmisDispense.noSubstituteFound' | message}}</caption>
         <thead>
             <tr>
                 <th>{{'cmisDispense.name' | message}}</th>
@@ -54,7 +60,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="groups in vm.summaries">
+            <tr ng-repeat="groups in vm.orderableGroup">
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input
@@ -76,7 +82,14 @@
                         max="groups[0].stockOnHand"
                         value="{{groups[0].balance = groups[0].stockOnHand - groups[0].dispenseQuantity}}"/>
                 </td>
-                <td><input type="checkbox" ng-attr-id="{{groups[0].orderable.id}}" ng-click="vm.addSubstitute(groups[0], this)" ng-model="groups[0].$selected"/></td>
+                <td>
+                    <input
+                        type="checkbox"
+                        ng-attr-id="{{groups[0].orderable.id}}"
+                        ng-click="vm.addSubstitute(groups[0], this)"
+                        ng-model="groups.$selected"
+                        ng-change="vm.addOrRemoveOrderable(groups)"/>
+                </td>
             </tr>
         </tbody>
     </table>

@@ -31,13 +31,28 @@
         '$stateParams',
         'user',
         'facility',
+        'program',
         'visit',
         'stateTrackerService',
-        'summaries',
+        'orderableGroup',
         '$filter',
         '$q',
         'alertService',
-        'INTERVAL'
+        'INTERVAL',
+        'srcDstAssignments',
+        '$scope',
+        'messageService',
+        'confirmService',
+        'REASON_TYPES',
+        'MAX_INTEGER_VALUE',
+        'ADJUSTMENT_TYPE',
+        'adjustmentType',
+        'loadingModalService',
+        'stockAdjustmentCreationService',
+        'offlineService',
+        'notificationService',
+        '$state',
+        'UNPACK_REASONS'
     ];
 
     function CmisDispenseController(
@@ -45,13 +60,29 @@
         $stateParams,
         user,
         facility,
+        program,
         visit,
         stateTrackerService,
-        summaries,
+        orderableGroup,
         $filter,
         $q,
         alertService,
-        INTERVAL
+        INTERVAL,
+        srcDstAssignments,
+        $scope,
+        messageService,
+        confirmService,
+        REASON_TYPES,
+        MAX_INTEGER_VALUE,
+        ADJUSTMENT_TYPE,
+        adjustmentType,
+        loadingModalService,
+        stockAdjustmentCreationService,
+        offlineService,
+        notificationService,
+        $state,
+        UNPACK_REASONS
+
     ) {
         var vm = this;
         vm.$onInit = onInit;
@@ -63,10 +94,12 @@
         vm.user = user;
         vm.facility = facility;
         vm.programs = vm.facility.supportedPrograms;
-        vm.program = vm.programs[0];
+        vm.program = program;
         vm.visit = visit.data;
-        vm.summaries = summaries;
         vm.substituteTab = [];
+        vm.orderableGroup = orderableGroup;
+        vm.selectedOrderableGroup = [];
+        vm.srcDstAssignments = srcDstAssignments;
 
         vm.date = '';
         vm.reason = '';
@@ -76,7 +109,9 @@
         vm.save = save;
         vm.getSoH = getSoH;
         vm.substituteSelected = substituteSelected;
-
+        vm.addOrRemoveMedication = addOrRemoveMedication;
+        vm.addOrRemoveOrderable = addOrRemoveOrderable;
+        
         /**
          * @ngdoc method
          * @methodOf cmis-dispense.controller:CmisDispenseController
@@ -91,7 +126,57 @@
             calculateMedications();
         }
 
+        /**
+         * @ngdoc method
+         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name submit
+         *
+         * @description
+         * Submit all added items.
+         */
+        vm.submit = function() {
+            $scope.$broadcast('openlmis-form-submit');
+            if (validateAllAddedItems()) {
+                var confirmMessage = messageService.get(vm.key('confirmInfo'), {
+                    username: user.username,
+                    number: vm.addedLineItems.length
+                });
+                confirmService.confirm(confirmMessage, vm.key('confirm')).then(confirmSubmit);
+            } else {
+                vm.keyword = null;
+                // reorderItems();
+                alertService.error('stockAdjustmentCreation.submitInvalid');
+            }
+        };
+
+        function addOrRemoveMedication(medication) {
+
+            var orderable = getOrderableByProductCode(medication.code);
+            if (!orderable) {
+                alertService.error('No orderable found for ' + medication.drug_name);
+                medication.$selected = false;
+                return;
+            }
+            if (medication.$selected) {
+                vm.selectedOrderableGroup.push(orderable);
+            } else {
+                var index = vm.selectedOrderableGroup.indexOf(orderable);
+                vm.selectedOrderableGroup.splice(index, 1);
+            }
+        }
+
+        function addOrRemoveOrderable(orderable) {
+
+            if (orderable.$selected) {
+                vm.selectedOrderableGroup.push(orderable);
+            } else {
+                var index = vm.selectedOrderableGroup.indexOf(orderable);
+                vm.selectedOrderableGroup.splice(index, 1);
+            }
+        }
+
         function calculateMedications() {
+
             vm.visit.prescriptions.forEach(function(prescription) {
                 prescription.medications.forEach(function(medication) {
                     medication.soh = getSoH('C100');
@@ -100,12 +185,20 @@
             });
         }
 
+        function getOrderableByProductCode(productCode) {
+
+            if (productCode) {
+                return $filter('filter')(vm.orderableGroup, {
+                    orderable: {
+                        productCode: productCode
+                    }
+                });
+            }
+        }
+
         function getSoH(code) {
-            var orderable = $filter('filter')(vm.summaries, {
-                orderable: {
-                    productCode: code
-                }
-            });
+
+            var orderable = getOrderableByProductCode(code);
             return orderable[0][0].stockOnHand;
         }
 
@@ -149,6 +242,54 @@
 
         function getProductName(item) {
             return item.orderable.fullProductName;
+        }
+
+        function confirmSubmit() {
+            loadingModalService.open();
+
+            var addedLineItems = angular.copy(vm.addedLineItems);
+
+            generateKitConstituentLineItem(addedLineItems);
+
+            stockAdjustmentCreationService.submitAdjustments(program.id, facility.id, addedLineItems, adjustmentType)
+                .then(function() {
+                    if (offlineService.isOffline()) {
+                        notificationService.offline(vm.key('submittedOffline'));
+                    } else {
+                        notificationService.success(vm.key('submitted'));
+                    }
+                    $state.go('openlmis.stockmanagement.stockCardSummaries', {
+                        facility: facility.id,
+                        program: program.id
+                    });
+                }, function(errorResponse) {
+                    loadingModalService.close();
+                    alertService.error(errorResponse.data.message);
+                });
+        }
+
+        function generateKitConstituentLineItem(addedLineItems) {
+            if (adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
+                return;
+            }
+
+            //CREDIT reason ID
+            var creditReason = {
+                id: UNPACK_REASONS.UNPACKED_FROM_KIT_REASON_ID
+            };
+
+            var constituentLineItems = [];
+
+            addedLineItems.forEach(function(lineItem) {
+                lineItem.orderable.children.forEach(function(constituent) {
+                    constituent.reason = creditReason;
+                    constituent.occurredDate = lineItem.occurredDate;
+                    constituent.quantity = lineItem.quantity * constituent.quantity;
+                    constituentLineItems.push(constituent);
+                });
+            });
+
+            addedLineItems.push.apply(addedLineItems, constituentLineItems);
         }
 
         function save() {
@@ -200,5 +341,109 @@
                     alertService.success('Send successful', olmisResponse);
                 });
         }
+
+        function isEmpty(value) {
+            return _.isUndefined(value) || _.isNull(value);
+        }
+
+        function validateAllAddedItems() {
+            _.each(vm.addedLineItems, function(item) {
+                vm.validateQuantity(item);
+                vm.validateDate(item);
+                vm.validateAssignment(item);
+                vm.validateReason(item);
+            });
+            return _.chain(vm.addedLineItems)
+                .groupBy(function(item) {
+                    return item.lot ? item.lot.id : item.orderable.id;
+                })
+                .values()
+                .flatten()
+                .all(isItemValid)
+                .value();
+        }
+
+        function isItemValid(item) {
+            return _.chain(item.$errors).keys()
+                .all(function(key) {
+                    return item.$errors[key] === false;
+                })
+                .value();
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name validateQuantity
+         *
+         * @description
+         * Validate line item quantity and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        vm.validateQuantity = function(lineItem) {
+            if (lineItem.quantity > lineItem.$previewSOH && lineItem.reason
+                    && lineItem.reason.reasonType === REASON_TYPES.DEBIT) {
+                lineItem.$errors.quantityInvalid = messageService
+                    .get('stockAdjustmentCreation.quantityGreaterThanStockOnHand');
+            } else if (lineItem.quantity > MAX_INTEGER_VALUE) {
+                lineItem.$errors.quantityInvalid = messageService.get('stockmanagement.numberTooLarge');
+            } else if (lineItem.quantity >= 1) {
+                lineItem.$errors.quantityInvalid = false;
+            } else {
+                lineItem.$errors.quantityInvalid = messageService.get(vm.key('positiveInteger'));
+            }
+            return lineItem;
+        };
+
+        /**
+         * @ngdoc method
+         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name validateAssignment
+         *
+         * @description
+         * Validate line item assignment and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        vm.validateAssignment = function(lineItem) {
+            if (adjustmentType.state !== ADJUSTMENT_TYPE.ADJUSTMENT.state &&
+                adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
+                lineItem.$errors.assignmentInvalid = isEmpty(lineItem.assignment);
+            }
+            return lineItem;
+        };
+
+        /**
+         * @ngdoc method
+         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name validateReason
+         *
+         * @description
+         * Validate line item reason and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        vm.validateReason = function(lineItem) {
+            if (adjustmentType.state === 'adjustment') {
+                lineItem.$errors.reasonInvalid = isEmpty(lineItem.reason);
+            }
+            return lineItem;
+        };
+
+        /**
+         * @ngdoc method
+         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name validateDate
+         *
+         * @description
+         * Validate line item occurred date and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        vm.validateDate = function(lineItem) {
+            lineItem.$errors.occurredDateInvalid = isEmpty(lineItem.occurredDate);
+            return lineItem;
+        };
     }
 })();

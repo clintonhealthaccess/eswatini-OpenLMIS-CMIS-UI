@@ -30,6 +30,7 @@
         'openlmis-i18n',
         'openlmis-date',
         'openlmis-pagination',
-        'openlmis-state-tracker'
+        'openlmis-state-tracker',
+        'stock-adjustment'
     ]);
 })();

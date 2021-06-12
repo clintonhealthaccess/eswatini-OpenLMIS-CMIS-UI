@@ -20,9 +20,9 @@
         .module('cmis-dispense')
         .config(routes);
 
-    routes.$inject = ['$stateProvider'];
+    routes.$inject = ['$stateProvider', 'ADJUSTMENT_TYPE'];
 
-    function routes($stateProvider) {
+    function routes($stateProvider, ADJUSTMENT_TYPE) {
         $stateProvider.state('openlmis.cmis.dispense', {
             isOffline: true,
             url: '/dispense',
@@ -46,6 +46,12 @@
                     }
                     return $stateParams.facility;
                 },
+                program: function($stateParams, facility) {
+                    if (_.isUndefined($stateParams.program)) {
+                        return facility.supportedPrograms[0];
+                    }
+                    return $stateParams.program;
+                },
                 user: function($stateParams, authorizationService) {
                     if (_.isUndefined($stateParams.user)) {
                         return authorizationService.getUser();
@@ -59,10 +65,22 @@
                     }
                     return $stateParams.visit;
                 },
-                summaries: function(facility, orderableGroupService) {
+                orderableGroup: function(program, facility, orderableGroupService) {
                     return orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
-                        facility.supportedPrograms[0].id, facility.id, true
+                        program.id, facility.id, true
                     );
+                },
+                adjustmentType: function() {
+                    return ADJUSTMENT_TYPE.ISSUE;
+                },
+                srcDstAssignments: function($stateParams, program, facility, sourceDestinationService) {
+                    if (_.isUndefined($stateParams.srcDstAssignments)) {
+                        return sourceDestinationService.getDestinationAssignments(
+                            // $stateParams.programId, facility.id
+                            program.id, facility.id
+                        );
+                    }
+                    return $stateParams.srcDstAssignments;
                 }
             }
         });
