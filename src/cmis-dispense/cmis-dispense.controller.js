@@ -291,6 +291,26 @@
 
             addedLineItems.push.apply(addedLineItems, constituentLineItems);
         }
+        /**
+         * Function search for duplicates in sunstitutes
+         * @param {*} substitutesTab 
+         * @returns true if no doplicates, false if duplicates occurs
+         */
+        function validateMedicationDuplicates(substitutesTab) {
+            var tempSubtituteId = '';
+            for (var x = 0; x < substitutesTab.length; x++) {
+                tempSubtituteId = substitutesTab[x].orderable.id;
+                for (var i = 0; i < substitutesTab.length; i++) {
+                    if ( x === i) {
+                        continue;
+                    }
+                    if (tempSubtituteId === substitutesTab[i].orderable.id) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         function save() {
             var selectedMedications = [];
@@ -323,6 +343,10 @@
                 );
             });
 
+            if (validateMedicationDuplicates(substitutesTab)) {
+                alertService.error('Medication must have different substitutes!');
+                return;
+            }
             var dataToSend = {};
 
             dataToSend.data = selectedMedications;
