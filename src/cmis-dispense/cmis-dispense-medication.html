@@ -87,7 +87,7 @@
                         type="checkbox"
                         ng-attr-id="{{groups[0].orderable.id}}"
                         ng-click="vm.addSubstitute(groups[0], this)"
-                        ng-model="groups.$selected"
+                        ng-model="groups[0].$selected"
                         ng-change="vm.addOrRemoveOrderable(groups)"/>
                 </td>
             </tr>

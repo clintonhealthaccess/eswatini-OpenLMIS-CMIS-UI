@@ -291,9 +291,10 @@
 
             addedLineItems.push.apply(addedLineItems, constituentLineItems);
         }
+
         /**
-         * Function search for duplicates in sunstitutes
-         * @param {*} substitutesTab 
+         * Function search for duplicates in substitutes
+         * @param {Table[Object]} substitutesTab 
          * @returns true if no doplicates, false if duplicates occurs
          */
         function validateMedicationDuplicates(substitutesTab) {
@@ -343,8 +344,9 @@
                 );
             });
 
-            if (validateMedicationDuplicates(substitutesTab)) {
-                alertService.error('Medication must have different substitutes!');
+            if (!validateMedicationDuplicates(substitutesTab)) {
+                // TODO add in messages
+                alertService.error('Medications must have different substitutes!');
                 return;
             }
             var dataToSend = {};
