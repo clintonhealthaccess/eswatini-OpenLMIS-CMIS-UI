@@ -232,7 +232,6 @@
         }
 
         function save() {
-            loadingModalService.open();
 
             gatherData();
             validateData();
@@ -243,21 +242,22 @@
                 username: user.username,
                 number: vm.addedLineItems.length
             });
-            confirmService.confirm(confirmMessage, vm.key('confirm')).then(
+            confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
+                loadingModalService.open();
+
                 $q.resolve(
                     CmisRequestService.putRequest(
                         '/prescription/client/dispense',
                         vm.selectedMedications
                     )
                 ).then(function(cmisResponse) {
-                    alertService.success('Send successful', cmisResponse);
-                    return cmisResponse;
+                    notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
 
                 })
                     .then(function() {
                         submitToStock();
-                    })
-            );
+                    });
+            });
         }
 
         function submitToStock() {
