@@ -19,7 +19,6 @@
             <tr ng-repeat="medication in prescription.medications">
                 <td>
                     <input
-                        id="assigned{{$index}}"
                         type="checkbox"
                         ng-model="medication.$selected"
                         ng-change="vm.addOrRemoveMedication(medication)"/>
@@ -32,12 +31,10 @@
                 <td>{{medication.balance}}</td>
                 <td>
                     <div ng-if="!medication.$selected">
-                    <select ng-disabled="medication.$selected" id="substituteSelect"
+                    <select ng-disabled="medication.$selected"
                         ng-model="medication.substitute"
                         ng-options="option.orderable.fullProductName for option in vm.substituteTab"
-                        ng-click="vm.substituteSelected(option)"
-                        required ng-required="!medication.$selected">
-                        <option value="">Select substitute</option>
+                        ng-click="vm.substituteSelected(option)">
                     </select>
                     </div>
                 </td>

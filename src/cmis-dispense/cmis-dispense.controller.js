@@ -301,7 +301,9 @@
                                 vm.reason,
                                 vm.notes
                             );
-                        } else {
+                            selectedMedications.push(medicationJson);
+                        }
+                        if(!medication.$selected && typeof medication.substitute.orderable !== 'undefined') {
                             medicationJson = CmisRequestService.cmisMedicationBilder(
                                 medication.medication_id,
                                 medication.substitute.quantity,
@@ -309,9 +311,9 @@
                                 vm.reason,
                                 vm.notes
                             );
-                            vm.substitutesTab.push(medication.substitute);
+                            substitutesTab.push(medication.substitute);
+                            selectedMedications.push(medicationJson);
                         }
-                        vm.selectedMedications.data.push(medicationJson);
                     }
                 );
             });
