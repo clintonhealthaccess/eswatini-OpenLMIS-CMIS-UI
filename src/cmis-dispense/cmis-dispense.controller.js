@@ -106,6 +106,10 @@
         vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
         vm.reasons = reasons;
+        vm.selectedMedications = {
+            data: []
+        };
+        vm.substitutesTab = [];
 
         vm.date = '';
         vm.reason = '';
@@ -131,45 +135,6 @@
             vm.date = $filter('isoDate')(new Date());
             calculateMedications();
         }
-
-        /**
-         * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
-         * @name submit
-         *
-         * @description
-         * Submit all added items.
-         */
-        vm.submit = function() {
-
-            vm.selectedOrderable.forEach(function(orderable) {
-
-                orderable.$errors = {};
-                orderable.$previewSOH = orderable.stockOnHand;
-                orderable.assignment = vm.srcDstAssignments[0];
-                orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
-                    ? {
-                        id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
-                    } : vm.reasons[0];
-                orderable.occurredDate = dateUtils.toStringDate(new Date());
-                orderable.assignment = vm.srcDstAssignments[0];
-
-                vm.addedLineItems.push(orderable);
-            });
-
-            $scope.$broadcast('openlmis-form-submit');
-            if (validateAllAddedItems()) {
-                var confirmMessage = messageService.get(vm.key('confirmInfo'), {
-                    username: user.username,
-                    number: vm.addedLineItems.length
-                });
-                confirmService.confirm(confirmMessage, vm.key('confirm')).then(confirmSubmit);
-            } else {
-                vm.keyword = null;
-                // reorderItems();
-                alertService.error('stockAdjustmentCreation.submitInvalid');
-            }
-        };
 
         function addOrRemoveMedication(medication) {
 
@@ -266,8 +231,36 @@
             return item.orderable.fullProductName;
         }
 
-        function confirmSubmit() {
+        function save() {
             loadingModalService.open();
+
+            gatherData();
+            validateData();
+
+            $scope.$broadcast('openlmis-form-submit');
+
+            var confirmMessage = messageService.get(vm.key('confirmInfo'), {
+                username: user.username,
+                number: vm.addedLineItems.length
+            });
+            confirmService.confirm(confirmMessage, vm.key('confirm')).then(
+                $q.resolve(
+                    CmisRequestService.putRequest(
+                        '/prescription/client/dispense',
+                        vm.selectedMedications
+                    )
+                ).then(function(cmisResponse) {
+                    alertService.success('Send successful', cmisResponse);
+                    return cmisResponse;
+
+                })
+                    .then(function() {
+                        submitToStock();
+                    })
+            );
+        }
+
+        function submitToStock() {
 
             var addedLineItems = angular.copy(vm.addedLineItems);
 
@@ -280,61 +273,21 @@
                     } else {
                         notificationService.success(vm.key('submitted'));
                     }
+                    vm.goToPreviousState();
                 }, function(errorResponse) {
                     loadingModalService.close();
                     alertService.error(errorResponse.data.message);
                 });
         }
 
-        // function generateKitConstituentLineItem(addedLineItems) {
-        //     if (adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
-        //         return;
-        //     }
+        function gatherData() {
 
-        //     //CREDIT reason ID
-        //     var creditReason = {
-        //         id: UNPACK_REASONS.UNPACKED_FROM_KIT_REASON_ID
-        //     };
-
-        //     var constituentLineItems = [];
-
-        //     addedLineItems.forEach(function(lineItem) {
-        //         lineItem.orderable.children.forEach(function(constituent) {
-        //             constituent.reason = creditReason;
-        //             constituent.occurredDate = lineItem.occurredDate;
-        //             constituent.quantity = lineItem.quantity * constituent.quantity;
-        //             constituentLineItems.push(constituent);
-        //         });
-        //     });
-
-        //     addedLineItems.push.apply(addedLineItems, constituentLineItems);
-        // }
-
-        /**
-         * Function search for duplicates in substitutes
-         * @param {Table[Object]} substitutesTab
-         * @returns true if no doplicates, false if duplicates occurs
-         */
-        function validateMedicationDuplicates(substitutesTab) {
-            var tempSubtituteId = '';
-            for (var x = 0; x < substitutesTab.length; x++) {
-                tempSubtituteId = substitutesTab[x].orderable.id;
-                for (var i = 0; i < substitutesTab.length; i++) {
-                    if (x === i) {
-                        continue;
-                    }
-                    if (tempSubtituteId === substitutesTab[i].orderable.id) {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            gatherCmisData();
+            gatherOlmisData();
         }
 
-        function save() {
+        function gatherCmisData() {
 
-            var selectedMedications = [];
-            var substitutesTab = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
                 angular.forEach(
                     prescription.medications,
@@ -356,37 +309,67 @@
                                 vm.reason,
                                 vm.notes
                             );
-                            substitutesTab.push(medication.substitute);
+                            vm.substitutesTab.push(medication.substitute);
                         }
-                        selectedMedications.push(medicationJson);
+                        vm.selectedMedications.data.push(medicationJson);
                     }
                 );
             });
+        }
 
-            if (!validateMedicationDuplicates(substitutesTab)) {
+        function gatherOlmisData() {
+
+            vm.selectedOrderable.forEach(function(orderable) {
+
+                orderable.$errors = {};
+                orderable.$previewSOH = orderable.stockOnHand;
+                orderable.assignment = vm.srcDstAssignments[0];
+                orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
+                    ? {
+                        id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
+                    } : vm.reasons[0];
+                orderable.occurredDate = dateUtils.toStringDate(new Date());
+                orderable.assignment = vm.srcDstAssignments[0];
+
+                vm.addedLineItems.push(orderable);
+            });
+
+        }
+
+        function validateData() {
+
+            if (!validateMedicationDuplicates(vm.substitutesTab)) {
                 // TODO add in messages
                 alertService.error('Medications must have different substitutes!');
                 return;
             }
-            var dataToSend = {};
 
-            dataToSend.data = selectedMedications;
-            $q.resolve(
-                CmisRequestService.putRequest(
-                    '/prescription/client/dispense',
-                    dataToSend
-                )
-            ).then(function(cmisResponse) {
-                alertService.success('Send successful', cmisResponse);
-                return cmisResponse;
+            if (!validateAllAddedItems()) {
+                vm.keyword = null;
+                // reorderItems();
+                alertService.error('stockAdjustmentCreation.submitInvalid');
+            }
+        }
 
-            })
-                .then(function() {
-                    vm.submit();
-                })
-                .then(function() {
-                    vm.goToPreviousState();
-                });
+        /**
+         * Function search for duplicates in substitutes
+         * @param {Table[Object]} substitutesTab
+         * @returns true if no doplicates, false if duplicates occurs
+         */
+        function validateMedicationDuplicates() {
+            var tempSubtituteId = '';
+            for (var x = 0; x < vm.substitutesTab.length; x++) {
+                tempSubtituteId = vm.substitutesTab[x].orderable.id;
+                for (var i = 0; i < vm.substitutesTab.length; i++) {
+                    if (x === i) {
+                        continue;
+                    }
+                    if (tempSubtituteId === vm.substitutesTab[i].orderable.id) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         function isEmpty(value) {
