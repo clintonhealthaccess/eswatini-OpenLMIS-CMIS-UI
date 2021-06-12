@@ -64,18 +64,16 @@
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input
-                        id="dispenseQuantity{{$index}}"
                         type="number"
                         min="0"
                         ng-disabled="!groups[0].$selected"
                         max="{{groups[0].stockOnHand}}"
                         step="1"
-                        ng-model="groups[0].dispenseQuantity"/>
+                        ng-model="groups[0].quantity"/>
                 </td>
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>
                     <input
-                        id="balance{{$index}}"
                         type="text"
                         ng-disabled="true"
                         min="0"
@@ -88,7 +86,7 @@
                         ng-attr-id="{{groups[0].orderable.id}}"
                         ng-click="vm.addSubstitute(groups[0], this)"
                         ng-model="groups[0].$selected"
-                        ng-change="vm.addOrRemoveOrderable(groups)"/>
+                        ng-change="vm.addOrRemoveOrderable(groups[0])"/>
                 </td>
             </tr>
         </tbody>

@@ -70,6 +70,12 @@
                         program.id, facility.id, true
                     );
                 },
+                reasons: function($stateParams, stockReasonsFactory, facility) {
+                    if (_.isUndefined($stateParams.reasons)) {
+                        return stockReasonsFactory.getIssueReasons($stateParams.programId, facility.type.id);
+                    }
+                    return $stateParams.reasons;
+                },
                 adjustmentType: function() {
                     return ADJUSTMENT_TYPE.ISSUE;
                 },

@@ -52,7 +52,9 @@
         'offlineService',
         'notificationService',
         '$state',
-        'UNPACK_REASONS'
+        'UNPACK_REASONS',
+        'reasons',
+        'dateUtils'
     ];
 
     function CmisDispenseController(
@@ -81,7 +83,9 @@
         offlineService,
         notificationService,
         $state,
-        UNPACK_REASONS
+        UNPACK_REASONS,
+        reasons,
+        dateUtils
 
     ) {
         var vm = this;
@@ -98,8 +102,10 @@
         vm.visit = visit.data;
         vm.substituteTab = [];
         vm.orderableGroup = orderableGroup;
-        vm.selectedOrderableGroup = [];
+        vm.selectedOrderable = [];
+        vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
+        vm.reasons = reasons;
 
         vm.date = '';
         vm.reason = '';
@@ -111,7 +117,7 @@
         vm.substituteSelected = substituteSelected;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveOrderable = addOrRemoveOrderable;
-        
+
         /**
          * @ngdoc method
          * @methodOf cmis-dispense.controller:CmisDispenseController
@@ -135,6 +141,22 @@
          * Submit all added items.
          */
         vm.submit = function() {
+
+            vm.selectedOrderable.forEach(function(orderable) {
+
+                orderable.$errors = {};
+                orderable.$previewSOH = orderable.stockOnHand;
+                orderable.assignment = vm.srcDstAssignments[0];
+                orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
+                    ? {
+                        id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
+                    } : vm.reasons[0];
+                orderable.occurredDate = dateUtils.toStringDate(new Date());
+                orderable.assignment = vm.srcDstAssignments[0];
+
+                vm.addedLineItems.push(orderable);
+            });
+
             $scope.$broadcast('openlmis-form-submit');
             if (validateAllAddedItems()) {
                 var confirmMessage = messageService.get(vm.key('confirmInfo'), {
@@ -153,25 +175,25 @@
 
             var orderable = getOrderableByProductCode(medication.code);
             if (!orderable) {
-                alertService.error('No orderable found for ' + medication.drug_name);
-                medication.$selected = false;
+                // alertService.error('No orderable found for ' + medication.drug_name);
+                // medication.$selected = false;
                 return;
             }
             if (medication.$selected) {
-                vm.selectedOrderableGroup.push(orderable);
+                vm.selectedOrderable.push(orderable);
             } else {
-                var index = vm.selectedOrderableGroup.indexOf(orderable);
-                vm.selectedOrderableGroup.splice(index, 1);
+                var index = vm.selectedOrderable.indexOf(orderable);
+                vm.selectedOrderable.splice(index, 1);
             }
         }
 
         function addOrRemoveOrderable(orderable) {
 
             if (orderable.$selected) {
-                vm.selectedOrderableGroup.push(orderable);
+                vm.selectedOrderable.push(orderable);
             } else {
-                var index = vm.selectedOrderableGroup.indexOf(orderable);
-                vm.selectedOrderableGroup.splice(index, 1);
+                var index = vm.selectedOrderable.indexOf(orderable);
+                vm.selectedOrderable.splice(index, 1);
             }
         }
 
@@ -210,7 +232,7 @@
             if (substitute.$selected === true) {
                 vm.substituteTab.push(substitute);
             } else {
-                substitute.dispenseQuantity = 0;
+                substitute.quantity = 0;
                 deleteSubstituteFromMedicaments(substitute, vm.visit.prescriptions);
                 deleteSubstitute(substitute);
             }
@@ -249,7 +271,7 @@
 
             var addedLineItems = angular.copy(vm.addedLineItems);
 
-            generateKitConstituentLineItem(addedLineItems);
+            // generateKitConstituentLineItem(addedLineItems);
 
             stockAdjustmentCreationService.submitAdjustments(program.id, facility.id, addedLineItems, adjustmentType)
                 .then(function() {
@@ -258,43 +280,39 @@
                     } else {
                         notificationService.success(vm.key('submitted'));
                     }
-                    $state.go('openlmis.stockmanagement.stockCardSummaries', {
-                        facility: facility.id,
-                        program: program.id
-                    });
                 }, function(errorResponse) {
                     loadingModalService.close();
                     alertService.error(errorResponse.data.message);
                 });
         }
 
-        function generateKitConstituentLineItem(addedLineItems) {
-            if (adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
-                return;
-            }
+        // function generateKitConstituentLineItem(addedLineItems) {
+        //     if (adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
+        //         return;
+        //     }
 
-            //CREDIT reason ID
-            var creditReason = {
-                id: UNPACK_REASONS.UNPACKED_FROM_KIT_REASON_ID
-            };
+        //     //CREDIT reason ID
+        //     var creditReason = {
+        //         id: UNPACK_REASONS.UNPACKED_FROM_KIT_REASON_ID
+        //     };
 
-            var constituentLineItems = [];
+        //     var constituentLineItems = [];
 
-            addedLineItems.forEach(function(lineItem) {
-                lineItem.orderable.children.forEach(function(constituent) {
-                    constituent.reason = creditReason;
-                    constituent.occurredDate = lineItem.occurredDate;
-                    constituent.quantity = lineItem.quantity * constituent.quantity;
-                    constituentLineItems.push(constituent);
-                });
-            });
+        //     addedLineItems.forEach(function(lineItem) {
+        //         lineItem.orderable.children.forEach(function(constituent) {
+        //             constituent.reason = creditReason;
+        //             constituent.occurredDate = lineItem.occurredDate;
+        //             constituent.quantity = lineItem.quantity * constituent.quantity;
+        //             constituentLineItems.push(constituent);
+        //         });
+        //     });
 
-            addedLineItems.push.apply(addedLineItems, constituentLineItems);
-        }
+        //     addedLineItems.push.apply(addedLineItems, constituentLineItems);
+        // }
 
         /**
          * Function search for duplicates in substitutes
-         * @param {Table[Object]} substitutesTab 
+         * @param {Table[Object]} substitutesTab
          * @returns true if no doplicates, false if duplicates occurs
          */
         function validateMedicationDuplicates(substitutesTab) {
@@ -302,7 +320,7 @@
             for (var x = 0; x < substitutesTab.length; x++) {
                 tempSubtituteId = substitutesTab[x].orderable.id;
                 for (var i = 0; i < substitutesTab.length; i++) {
-                    if ( x === i) {
+                    if (x === i) {
                         continue;
                     }
                     if (tempSubtituteId === substitutesTab[i].orderable.id) {
@@ -314,6 +332,7 @@
         }
 
         function save() {
+
             var selectedMedications = [];
             var substitutesTab = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
@@ -332,7 +351,7 @@
                         } else {
                             medicationJson = CmisRequestService.cmisMedicationBilder(
                                 medication.medication_id,
-                                medication.substitute.dispenseQuantity,
+                                medication.substitute.quantity,
                                 vm.date,
                                 vm.reason,
                                 vm.notes
@@ -358,13 +377,15 @@
                     dataToSend
                 )
             ).then(function(cmisResponse) {
-                console.log(cmisResponse);
-                console.log(substitutesTab);
+                alertService.success('Send successful', cmisResponse);
                 return cmisResponse;
 
             })
-                .then(function(olmisResponse) {
-                    alertService.success('Send successful', olmisResponse);
+                .then(function() {
+                    vm.submit();
+                })
+                .then(function() {
+                    vm.goToPreviousState();
                 });
         }
 
@@ -470,6 +491,21 @@
         vm.validateDate = function(lineItem) {
             lineItem.$errors.occurredDateInvalid = isEmpty(lineItem.occurredDate);
             return lineItem;
+        };
+
+        /**
+         * @ngdoc property
+         * @propertyOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @name offline
+         * @type {boolean}
+         *
+         * @description
+         * Holds information about internet connection
+         */
+        vm.offline = offlineService.isOffline;
+
+        vm.key = function(secondaryKey) {
+            return adjustmentType.prefix + 'Creation.' + secondaryKey;
         };
     }
 })();
