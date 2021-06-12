@@ -106,9 +106,7 @@
         vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
         vm.reasons = reasons;
-        vm.selectedMedications = {
-            data: []
-        };
+        vm.selectedMedications = [];
         vm.substitutesTab = [];
 
         vm.date = '';
@@ -118,7 +116,6 @@
         vm.addSubstitute = addSubstitute;
         vm.save = save;
         vm.getSoH = getSoH;
-        vm.substituteSelected = substituteSelected;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveOrderable = addOrRemoveOrderable;
 
@@ -212,11 +209,6 @@
             }
         }
 
-        function substituteSelected(substitute) {
-            //place for remove substitute from list when selected
-            console.log(substitute);
-        }
-
         function deleteSubstituteFromMedicaments(substitute, prescriptions) {
             angular.forEach(prescriptions, function(prescription) {
                 angular.forEach(prescription.medications, function(medication) {
@@ -235,7 +227,22 @@
             loadingModalService.open();
 
             gatherData();
-            validateData();
+
+            if (!validateMedicationDuplicates(vm.substitutesTab)) {
+                // TODO add in messages
+                alertService.error('Medications must have different substitutes!');
+                return;
+            }
+            if (vm.selectedMedications.length === 0) {
+                alertService.error('No data to send');
+                return;
+            }
+
+            if (!validateAllAddedItems()) {
+                vm.keyword = null;
+                // reorderItems();
+                alertService.error('stockAdjustmentCreation.submitInvalid');
+            }
 
             $scope.$broadcast('openlmis-form-submit');
 
@@ -243,11 +250,13 @@
                 username: user.username,
                 number: vm.addedLineItems.length
             });
+            var cmisDataPut = {};
+            cmisDataPut.data = vm.selectedMedications;
             confirmService.confirm(confirmMessage, vm.key('confirm')).then(
                 $q.resolve(
                     CmisRequestService.putRequest(
                         '/prescription/client/dispense',
-                        vm.selectedMedications
+                        cmisDataPut
                     )
                 ).then(function(cmisResponse) {
                     alertService.success('Send successful', cmisResponse);
@@ -282,13 +291,13 @@
 
         function gatherData() {
 
-            gatherCmisData();
+            gatherCmisData(vm.visit.prescriptions, vm.selectedMedications, vm.substituteTab);
             gatherOlmisData();
         }
 
-        function gatherCmisData() {
+        function gatherCmisData(prescriptions, selectedMedications, substitutesTab) {
 
-            angular.forEach(vm.visit.prescriptions, function(prescription) {
+            angular.forEach(prescriptions, function(prescription) {
                 angular.forEach(
                     prescription.medications,
                     function(medication) {
@@ -303,16 +312,18 @@
                             );
                             selectedMedications.push(medicationJson);
                         }
-                        if(!medication.$selected && typeof medication.substitute.orderable !== 'undefined') {
-                            medicationJson = CmisRequestService.cmisMedicationBilder(
-                                medication.medication_id,
-                                medication.substitute.quantity,
-                                vm.date,
-                                vm.reason,
-                                vm.notes
-                            );
-                            substitutesTab.push(medication.substitute);
-                            selectedMedications.push(medicationJson);
+                        if (!medication.$selected && medication.hasOwnProperty('substitute')) {
+                            if (medication.substitute !== null) {
+                                medicationJson = CmisRequestService.cmisMedicationBilder(
+                                    medication.medication_id,
+                                    medication.substitute.quantity,
+                                    vm.date,
+                                    vm.reason,
+                                    vm.notes
+                                );
+                                substitutesTab.push(medication.substitute);
+                                selectedMedications.push(medicationJson);
+                            }
                         }
                     }
                 );
@@ -336,21 +347,6 @@
                 vm.addedLineItems.push(orderable);
             });
 
-        }
-
-        function validateData() {
-
-            if (!validateMedicationDuplicates(vm.substitutesTab)) {
-                // TODO add in messages
-                alertService.error('Medications must have different substitutes!');
-                return;
-            }
-
-            if (!validateAllAddedItems()) {
-                vm.keyword = null;
-                // reorderItems();
-                alertService.error('stockAdjustmentCreation.submitInvalid');
-            }
         }
 
         /**

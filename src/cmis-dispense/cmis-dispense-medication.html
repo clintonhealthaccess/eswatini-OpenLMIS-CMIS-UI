@@ -33,8 +33,7 @@
                     <div ng-if="!medication.$selected">
                     <select ng-disabled="medication.$selected"
                         ng-model="medication.substitute"
-                        ng-options="option.orderable.fullProductName for option in vm.substituteTab"
-                        ng-click="vm.substituteSelected(option)">
+                        ng-options="option.orderable.fullProductName for option in vm.substituteTab">
                     </select>
                     </div>
                 </td>
