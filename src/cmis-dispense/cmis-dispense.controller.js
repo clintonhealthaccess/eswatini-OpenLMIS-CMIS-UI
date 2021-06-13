@@ -135,10 +135,11 @@
 
         function addOrRemoveMedication(medication) {
 
-            var orderable = getOrderableByProductCode('20010102AMH');
+            var orderable = getOrderableByProductCode(medication.code);
 
             if (!orderable && medication.$selected) {
-                medication.noOrderable = 'No product found';
+                medication.$errors = {};
+                medication.$errors.noOrderable = 'No product found';
                 return;
             }
 
@@ -148,6 +149,7 @@
                 // medication.orderable.quantity = medication.quantity;
                 medication.balance = medication.orderable.stockOnHand - medication.quantity;
             } else {
+                medication.$errors = {};
                 medication.orderable = null;
                 medication.quantity = null;
                 medication.balance = null;
@@ -233,7 +235,10 @@
         function gatherData() {
 
             gatherCmisData();
-            gatherOlmisData();
+            if (!gatherOlmisData()) {
+                return false;
+            }
+            return true;
         }
 
         function gatherCmisData() {
@@ -274,6 +279,7 @@
         }
 
         function gatherOlmisData() {
+            var success = true;
             vm.addedLineItems = [];
 
             vm.visit.prescriptions.forEach(function(prescription) {
@@ -285,9 +291,16 @@
                     if (medication.substitute) {
                         orderable = medication.substitute;
                     } else {
+                        if (medication.$errors.noOrderable === 'No product found') {
+                            alertService.error('You can not dispense medication without assigned product from OLMIS.' +
+                                'Please try to use subsitute or contact administrator.');
+                            success = false;
+                            return;
+                        }
                         orderable = medication.orderable;
+                        orderable.quantity = medication.quantity;
                     }
-                    orderable.quantity = medication.quantity;
+
                     orderable.$errors = {};
                     orderable.$previewSOH = orderable.stockOnHand;
                     orderable.assignment = vm.srcDstAssignments[0];
@@ -302,6 +315,7 @@
                 });
             });
 
+            return success;
         }
 
         /**
@@ -477,7 +491,9 @@
 
         function save() {
 
-            gatherData();
+            if (!gatherData()) {
+                return;
+            }
             if (!validateData()) {
                 return;
             }

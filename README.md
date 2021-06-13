@@ -17,7 +17,7 @@ This repository is the UI for the [OpenLMIS Eswatini CMIS Service.](https://gith
 > touch .env
 ```
 3. Develop w/ Docker by running `docker-compose run --service-ports eswatini-cmis-ui`.
-4. You should now be in an interactive shell inside the newly created development environment, build the project with: 
+4. You should now be in an interactive shell inside the newly created development environment, build the project with:
 ```shell
 $ npm install // installs the NodeJS tools
 
@@ -36,7 +36,7 @@ See the [OpenLMIS/dev-ui project](https://github.com/OpenLMIS/dev-ui) for more i
 // Open docker in an interactive shell
 > docker-compose run --service-ports eswatini-cmis-ui
 
-// Install dependencies 
+// Install dependencies
 $ npm install
 $ grunt clean
 $ grunt bower
@@ -67,7 +67,7 @@ the UI module.
 
 ```shell
 > docker-compose pull
-> docker-compose run --entrypoint ./build.sh eswatini-cmis-ui
+> docker-compose run --entrypoint /dev-ui/build.sh eswatini-cmis-ui
 > docker-compose build image
 ```
 
