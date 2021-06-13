@@ -104,21 +104,20 @@
         vm.visit = visit.data;
         vm.substituteTab = [];
         vm.orderableGroup = orderableGroup;
-        vm.selectedOrderable = [];
+        vm.selectedSubstitutes = [];
         vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
         vm.reasons = reasons;
         vm.selectedMedications = [];
-        vm.substitutesTab = [];
 
         vm.date = '';
         vm.reason = '';
         vm.notes = '';
 
-        vm.addSubstitute = addSubstitute;
+        // vm.addSubstitute = addSubstitute;
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
-        vm.addOrRemoveOrderable = addOrRemoveOrderable;
+        vm.addOrRemoveSubstitute = addOrRemoveSubstitute;
         vm.calculateQuantity = calculateQuantity;
 
         /**
@@ -136,7 +135,7 @@
 
         function addOrRemoveMedication(medication) {
 
-            var orderable = getOrderableByProductCode(medication.code);
+            var orderable = getOrderableByProductCode('20010102AMH');
 
             if (!orderable && medication.$selected) {
                 medication.noOrderable = 'No product found';
@@ -144,22 +143,27 @@
             }
 
             if (medication.$selected) {
-                medication.stockOnHand = orderable[0][0].stockOnHand;
-                medication.balance = calculateInterval(medication);
-                vm.selectedOrderable.push(orderable);
+                medication.orderable = orderable[0][0];
+                medication.quantity = calculateQuantity(medication);
+                // medication.orderable.quantity = medication.quantity;
+                medication.balance = medication.orderable.stockOnHand - medication.quantity;
             } else {
-                var index = vm.selectedOrderable.indexOf(orderable);
-                vm.selectedOrderable.splice(index, 1);
+                medication.orderable = null;
+                medication.quantity = null;
+                medication.balance = null;
+                medication.substitute = null;
             }
         }
 
-        function addOrRemoveOrderable(orderable) {
+        function addOrRemoveSubstitute(orderable) {
 
             if (orderable.$selected) {
-                vm.selectedOrderable.push(orderable);
+                vm.selectedSubstitutes.push(orderable);
             } else {
-                var index = vm.selectedOrderable.indexOf(orderable);
-                vm.selectedOrderable.splice(index, 1);
+                var index = vm.selectedSubstitutes.indexOf(orderable);
+                vm.selectedSubstitutes.splice(index, 1);
+                deleteSubstituteFromMedications(orderable);
+                orderable.quantity = null;
             }
         }
 
@@ -174,41 +178,14 @@
             }
         }
 
-        function calculateInterval(medication) {
-            return medication.soh - medication.dose * medication.duration * INTERVAL.type[medication.interval];
-        }
-
-        function addSubstitute(substitute) {
-            if (substitute.$selected === true) {
-                vm.substituteTab.push(substitute);
-            } else {
-                substitute.quantity = 0;
-                deleteSubstituteFromMedicaments(substitute, vm.visit.prescriptions);
-                deleteSubstitute(substitute);
-            }
-        }
-
-        function deleteSubstitute(substitute) {
-            for (var i = 0; i <= vm.substituteTab.length; i++) {
-                if (getProductName(substitute) === getProductName(vm.substituteTab[0])) {
-                    vm.substituteTab.splice(i, 1);
-                    break;
-                }
-            }
-        }
-
-        function deleteSubstituteFromMedicaments(substitute, prescriptions) {
-            angular.forEach(prescriptions, function(prescription) {
+        function deleteSubstituteFromMedications(substitute) {
+            angular.forEach(vm.prescriptions, function(prescription) {
                 angular.forEach(prescription.medications, function(medication) {
                     if (medication.substitute.orderable.id === substitute.orderable.id) {
                         medication.substitute = null;
                     }
                 });
             });
-        }
-
-        function getProductName(item) {
-            return item.orderable.fullProductName;
         }
 
         function submitToStock() {
@@ -233,7 +210,7 @@
 
         function validateData() {
 
-            if (!validateMedicationDuplicates(vm.substitutesTab)) {
+            if (!validateMedicationDuplicates()) {
                 // TODO add in messages
                 alertService.error('Medications must have different substitutes!');
                 return false;
@@ -251,7 +228,6 @@
             }
 
             return true;
-
         }
 
         function gatherData() {
@@ -267,28 +243,30 @@
                     prescription.medications,
                     function(medication) {
                         var medicationJson = {};
-                        if (medication.$selected) {
+
+                        if (!medication.$selected) {
+                            return;
+                        }
+
+                        if (medication.substitute) {
                             medicationJson = CmisRequestService.cmisMedicationBilder(
                                 medication.medication_id,
-                                medication.balance,
+                                medication.substitute.quantity,
                                 vm.date,
                                 vm.reason,
                                 vm.notes
                             );
                             vm.selectedMedications.push(medicationJson);
-                        }
-                        if (!medication.$selected && medication.hasOwnProperty('substitute')) {
-                            if (medication.substitute !== null) {
-                                medicationJson = CmisRequestService.cmisMedicationBilder(
-                                    medication.medication_id,
-                                    medication.substitute.quantity,
-                                    vm.date,
-                                    vm.reason,
-                                    vm.notes
-                                );
-                                vm.substitutesTab.push(medication.substitute);
-                                vm.selectedMedications.push(medicationJson);
-                            }
+
+                        } else {
+                            medicationJson = CmisRequestService.cmisMedicationBilder(
+                                medication.medication_id,
+                                medication.quantity,
+                                vm.date,
+                                vm.reason,
+                                vm.notes
+                            );
+                            vm.selectedMedications.push(medicationJson);
                         }
                     }
                 );
@@ -296,20 +274,32 @@
         }
 
         function gatherOlmisData() {
+            vm.addedLineItems = [];
 
-            vm.selectedOrderable.forEach(function(orderable) {
+            vm.visit.prescriptions.forEach(function(prescription) {
+                prescription.medications.forEach(function(medication) {
+                    var orderable;
+                    if (!medication.$selected) {
+                        return;
+                    }
+                    if (medication.substitute) {
+                        orderable = medication.substitute;
+                    } else {
+                        orderable = medication.orderable;
+                    }
+                    orderable.quantity = medication.quantity;
+                    orderable.$errors = {};
+                    orderable.$previewSOH = orderable.stockOnHand;
+                    orderable.assignment = vm.srcDstAssignments[0];
+                    orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
+                        ? {
+                            id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
+                        } : vm.reasons[0];
+                    orderable.occurredDate = dateUtils.toStringDate(new Date());
+                    orderable.assignment = vm.srcDstAssignments[0];
 
-                orderable.$errors = {};
-                orderable.$previewSOH = orderable.stockOnHand;
-                orderable.assignment = vm.srcDstAssignments[0];
-                orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
-                    ? {
-                        id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
-                    } : vm.reasons[0];
-                orderable.occurredDate = dateUtils.toStringDate(new Date());
-                orderable.assignment = vm.srcDstAssignments[0];
-
-                vm.addedLineItems.push(orderable);
+                    vm.addedLineItems.push(orderable);
+                });
             });
 
         }
@@ -320,19 +310,28 @@
          * @returns true if no doplicates, false if duplicates occurs
          */
         function validateMedicationDuplicates() {
-            var tempSubtituteId = '';
-            for (var x = 0; x < vm.substitutesTab.length; x++) {
-                tempSubtituteId = vm.substitutesTab[x].orderable.id;
-                for (var i = 0; i < vm.substitutesTab.length; i++) {
-                    if (x === i) {
-                        continue;
+            var bool = true;
+            var medications = [];
+            vm.visit.prescriptions.forEach(function(prescription) {
+                prescription.medications.forEach(function(medication) {
+                    medications.push(medication);
+                });
+            });
+
+            vm.selectedSubstitutes.forEach(function(substitute) {
+                if ($filter('filter')(medications, {
+                    substitute:
+                    {
+                        orderable: {
+                            id: substitute.orderable.id
+                        }
                     }
-                    if (tempSubtituteId === vm.substitutesTab[i].orderable.id) {
-                        return false;
-                    }
+                }, true).length > 1) {
+                    bool = false;
                 }
-            }
-            return true;
+            });
+
+            return bool;
         }
 
         function isEmpty(value) {

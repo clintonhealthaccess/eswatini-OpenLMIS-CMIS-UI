@@ -11,8 +11,8 @@
                 <th>{{'cmisDispense.duration' | message}}</th>
                 <th>{{'cmisDispense.interval' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
-                <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
+                <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.substitute' | message}}</th>
             </tr>
         </thead>
@@ -27,22 +27,23 @@
                 <td>{{medication.drug_name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
-                <td>{{medication.interval}}
+                <td>
+                    <div ng-if="!medication.hasOwnInterval">
+                        {{medication.interval}}
+                    </div>
                     <div ng-if="medication.hasOwnInterval">
                         <hr>
                         <input type="number" ng-model="medication.ownInterval" ng-init="medication.ownInterval=0" value="0">
                     </div>
                 </td>
-                <td>{{ (medication.noOrderable) ? medication.noOrderable : medication.soh}}</td>
-                <td>{{ vm.calculateQuantity(medication) }}</td>
+                <td>{{ (medication.noOrderable) ? medication.noOrderable : medication.orderable.stockOnHand}}</td>
                 <td>{{medication.balance}}</td>
+                <td>{{medication.quantity=vm.calculateQuantity(medication)}}</td>
                 <td>
-                    <div ng-if="!medication.$selected">
-                    <select ng-disabled="medication.$selected"
+                    <select ng-disabled="!medication.$selected"
                         ng-model="medication.substitute"
-                        ng-options="option.orderable.fullProductName for option in vm.substituteTab">
+                        ng-options="option.orderable.fullProductName for option in vm.selectedSubstitutes">
                     </select>
-                    </div>
                 </td>
             </tr>
         </tbody>
@@ -82,16 +83,15 @@
                         ng-disabled="true"
                         min="0"
                         max="groups[0].stockOnHand"
-                        value="{{groups[0].balance = groups[0].stockOnHand - groups[0].dispenseQuantity}}"/>
+                        value="{{groups[0].balance = groups[0].stockOnHand - groups[0].quantity}}"/>
                     </div>
                 </td>
                 <td>
                     <input
                         type="checkbox"
                         ng-attr-id="{{groups[0].orderable.id}}"
-                        ng-click="vm.addSubstitute(groups[0], this)"
                         ng-model="groups[0].$selected"
-                        ng-change="vm.addOrRemoveOrderable(groups[0])"/>
+                        ng-change="vm.addOrRemoveSubstitute(groups[0])"/>
                 </td>
             </tr>
         </tbody>
