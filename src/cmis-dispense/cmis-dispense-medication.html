@@ -70,6 +70,7 @@
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>
                     <input
+                        ng-if="groups[0].$selected"
                         type="text"
                         ng-disabled="true"
                         min="0"
