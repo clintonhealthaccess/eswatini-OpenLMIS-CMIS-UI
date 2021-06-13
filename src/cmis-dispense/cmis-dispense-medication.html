@@ -69,13 +69,14 @@
                 </td>
                 <td>{{groups[0].stockOnHand}}</td>
                 <td>
+                    <div ng-if="groups[0].$selected">
                     <input
-                        ng-if="groups[0].$selected"
                         type="text"
                         ng-disabled="true"
                         min="0"
                         max="groups[0].stockOnHand"
                         value="{{groups[0].balance = groups[0].stockOnHand - groups[0].dispenseQuantity}}"/>
+                    </div>
                 </td>
                 <td>
                     <input
