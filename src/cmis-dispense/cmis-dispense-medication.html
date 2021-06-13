@@ -27,7 +27,7 @@
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
                 <td>{{medication.interval}}</td>
-                <td>{{medication.soh}}</td>
+                <td>{{ (medication.noOrderable) ? medication.noOrderable : medication.soh}}</td>
                 <td>{{medication.balance}}</td>
                 <td>
                     <div ng-if="!medication.$selected">

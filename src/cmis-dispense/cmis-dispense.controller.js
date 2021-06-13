@@ -115,7 +115,6 @@
 
         vm.addSubstitute = addSubstitute;
         vm.save = save;
-        vm.getSoH = getSoH;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveOrderable = addOrRemoveOrderable;
 
@@ -130,18 +129,20 @@
         function onInit() {
             CmisRequestService.saveOath2Token();
             vm.date = $filter('isoDate')(new Date());
-            calculateMedications();
         }
 
         function addOrRemoveMedication(medication) {
 
             var orderable = getOrderableByProductCode(medication.code);
-            if (!orderable) {
-                // alertService.error('No orderable found for ' + medication.drug_name);
-                // medication.$selected = false;
+
+            if (!orderable && medication.$selected) {
+                medication.noOrderable = 'No product found';
                 return;
             }
+
             if (medication.$selected) {
+                medication.stockOnHand = orderable[0][0].stockOnHand;
+                medication.balance = calculateInterval(medication);
                 vm.selectedOrderable.push(orderable);
             } else {
                 var index = vm.selectedOrderable.indexOf(orderable);
@@ -159,16 +160,6 @@
             }
         }
 
-        function calculateMedications() {
-
-            vm.visit.prescriptions.forEach(function(prescription) {
-                prescription.medications.forEach(function(medication) {
-                    medication.soh = getSoH('C100');
-                    medication.balance = calculateInterval(medication);
-                });
-            });
-        }
-
         function getOrderableByProductCode(productCode) {
 
             if (productCode) {
@@ -178,12 +169,6 @@
                     }
                 });
             }
-        }
-
-        function getSoH(code) {
-
-            var orderable = getOrderableByProductCode(code);
-            return orderable[0][0].stockOnHand;
         }
 
         function calculateInterval(medication) {
@@ -226,21 +211,8 @@
         function save() {
 
             gatherData();
-
-            if (!validateMedicationDuplicates(vm.substitutesTab)) {
-                // TODO add in messages
-                alertService.error('Medications must have different substitutes!');
+            if (!validateData()) {
                 return;
-            }
-            if (vm.selectedMedications.length === 0) {
-                alertService.error('No data to send');
-                return;
-            }
-
-            if (!validateAllAddedItems()) {
-                vm.keyword = null;
-                // reorderItems();
-                alertService.error('stockAdjustmentCreation.submitInvalid');
             }
 
             $scope.$broadcast('openlmis-form-submit');
@@ -249,14 +221,15 @@
                 username: user.username,
                 number: vm.addedLineItems.length
             });
-            var cmisDataPut = {};
-            cmisDataPut.data = vm.selectedMedications;
+
             confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
                 loadingModalService.open();
                 $q.resolve(
                     CmisRequestService.putRequest(
                         '/prescription/client/dispense',
-                        cmisDataPut
+                        {
+                            data: vm.selectedMedications
+                        }
                     )
                 ).then(function(cmisResponse) {
                     notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
@@ -288,15 +261,38 @@
                 });
         }
 
+        function validateData() {
+
+            if (!validateMedicationDuplicates(vm.substitutesTab)) {
+                // TODO add in messages
+                alertService.error('Medications must have different substitutes!');
+                return false;
+            }
+            if (vm.selectedMedications.length === 0) {
+                alertService.error('No data to send');
+                return false;
+            }
+
+            if (!validateAllAddedItems()) {
+                vm.keyword = null;
+                // reorderItems();
+                alertService.error('stockAdjustmentCreation.submitInvalid');
+                return false;
+            }
+
+            return true;
+
+        }
+
         function gatherData() {
 
-            gatherCmisData(vm.visit.prescriptions, vm.selectedMedications, vm.substituteTab);
+            gatherCmisData();
             gatherOlmisData();
         }
 
-        function gatherCmisData(prescriptions, selectedMedications, substitutesTab) {
+        function gatherCmisData() {
 
-            angular.forEach(prescriptions, function(prescription) {
+            angular.forEach(vm.visit.prescriptions, function(prescription) {
                 angular.forEach(
                     prescription.medications,
                     function(medication) {
@@ -309,7 +305,7 @@
                                 vm.reason,
                                 vm.notes
                             );
-                            selectedMedications.push(medicationJson);
+                            vm.selectedMedications.push(medicationJson);
                         }
                         if (!medication.$selected && medication.hasOwnProperty('substitute')) {
                             if (medication.substitute !== null) {
@@ -320,8 +316,8 @@
                                     vm.reason,
                                     vm.notes
                                 );
-                                substitutesTab.push(medication.substitute);
-                                selectedMedications.push(medicationJson);
+                                vm.substitutesTab.push(medication.substitute);
+                                vm.selectedMedications.push(medicationJson);
                             }
                         }
                     }
