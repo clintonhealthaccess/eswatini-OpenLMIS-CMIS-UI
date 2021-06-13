@@ -54,7 +54,8 @@
         '$state',
         'UNPACK_REASONS',
         'reasons',
-        'dateUtils'
+        'dateUtils',
+        'CmisIntervalService'
     ];
 
     function CmisDispenseController(
@@ -85,7 +86,8 @@
         $state,
         UNPACK_REASONS,
         reasons,
-        dateUtils
+        dateUtils,
+        CmisIntervalService
 
     ) {
         var vm = this;
@@ -117,6 +119,7 @@
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveOrderable = addOrRemoveOrderable;
+        vm.calculateQuantity = calculateQuantity;
 
         /**
          * @ngdoc method
@@ -206,39 +209,6 @@
 
         function getProductName(item) {
             return item.orderable.fullProductName;
-        }
-
-        function save() {
-
-            gatherData();
-            if (!validateData()) {
-                return;
-            }
-
-            $scope.$broadcast('openlmis-form-submit');
-
-            var confirmMessage = messageService.get(vm.key('confirmInfo'), {
-                username: user.username,
-                number: vm.addedLineItems.length
-            });
-
-            confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
-                loadingModalService.open();
-                $q.resolve(
-                    CmisRequestService.putRequest(
-                        '/prescription/client/dispense',
-                        {
-                            data: vm.selectedMedications
-                        }
-                    )
-                ).then(function(cmisResponse) {
-                    notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
-
-                })
-                    .then(function() {
-                        submitToStock();
-                    });
-            });
         }
 
         function submitToStock() {
@@ -483,5 +453,60 @@
         vm.key = function(secondaryKey) {
             return adjustmentType.prefix + 'Creation.' + secondaryKey;
         };
+
+        function calculateQuantity(medication) {
+            var dose = parseInt(medication.dose, 10);
+            var duration = parseInt(medication.duration, 10);
+            var intervalType = INTERVAL.type[medication.interval];
+            var quantity = 0;
+
+            if (intervalType === INTERVAL.type.wd) {
+                var weeklyDays = CmisIntervalService.countWeeklyDays(duration);
+
+                quantity = (dose * weeklyDays);
+
+                return quantity;
+            }
+            if (intervalType === INTERVAL.type.pm) {
+                medication.hasOwnInterval = true;
+                quantity = (dose * duration * medication.ownInterval);
+                return quantity;
+            }
+            quantity = (dose * duration * intervalType);
+            return quantity;
+        }
+
+        function save() {
+
+            gatherData();
+            if (!validateData()) {
+                return;
+            }
+
+            $scope.$broadcast('openlmis-form-submit');
+
+            var confirmMessage = messageService.get(vm.key('confirmInfo'), {
+                username: user.username,
+                number: vm.addedLineItems.length
+            });
+
+            confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
+                loadingModalService.open();
+                $q.resolve(
+                    CmisRequestService.putRequest(
+                        '/prescription/client/dispense',
+                        {
+                            data: vm.selectedMedications
+                        }
+                    )
+                ).then(function(cmisResponse) {
+                    notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
+
+                })
+                    .then(function() {
+                        submitToStock();
+                    });
+            });
+        }
     }
 })();

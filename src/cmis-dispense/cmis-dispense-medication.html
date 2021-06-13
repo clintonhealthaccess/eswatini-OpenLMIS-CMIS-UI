@@ -11,6 +11,7 @@
                 <th>{{'cmisDispense.duration' | message}}</th>
                 <th>{{'cmisDispense.interval' | message}}</th>
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
+                <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
                 <th>{{'cmisDispense.substitute' | message}}</th>
             </tr>
@@ -26,8 +27,14 @@
                 <td>{{medication.drug_name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
-                <td>{{medication.interval}}</td>
+                <td>{{medication.interval}}
+                    <div ng-if="medication.hasOwnInterval">
+                        <hr>
+                        <input type="number" ng-model="medication.ownInterval" ng-init="medication.ownInterval=0" value="0">
+                    </div>
+                </td>
                 <td>{{ (medication.noOrderable) ? medication.noOrderable : medication.soh}}</td>
+                <td>{{ vm.calculateQuantity(medication) }}</td>
                 <td>{{medication.balance}}</td>
                 <td>
                     <div ng-if="!medication.$selected">
