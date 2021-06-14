@@ -59,13 +59,12 @@
         };
 
         function link(scope, element) {
-            if (scope.vm.hasOwnProperty('substituteTab')) {
-                //sticki header disabled if inside of dispense
-                return;
-            }
             // Only check for sticky elements if within a table container
             if (element.parents('.openlmis-table-container').length === 0) {
                 return ;
+            }
+            if (element.parents('.cmis-view').length !== 0) {
+                return;
             }
             var parent = element.parent(),
                 window = angular.element($window),
