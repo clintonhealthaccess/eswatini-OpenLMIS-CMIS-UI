@@ -43,7 +43,7 @@ services:
       - '/openlmis-ui-layout'
   image:
     build: .
-    image: eswatini-cmis-ui
+    image: kausamusa/eswatini-cmis-ui
 volumes:
   olmis-sync:
     external: true

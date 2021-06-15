@@ -149,7 +149,7 @@
                 // medication.orderable.quantity = medication.quantity;
                 medication.balance = medication.orderable.stockOnHand - medication.quantity;
             } else {
-                medication.$errors = {};
+                medication.$errors = null;
                 medication.orderable = null;
                 medication.quantity = null;
                 medication.balance = null;

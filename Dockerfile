@@ -1,6 +1,6 @@
 FROM debian:jessie
 
-WORKDIR /openlmis-eswatini-cmis-ui
+WORKDIR /eswatini-cmis-ui
 
 COPY package.json .
 COPY package-yarn.json .
