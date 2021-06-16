@@ -50,7 +50,7 @@
      * @return {String}     cmis URL
      */
         return function(url) {
-            return 'https://bbf27fdc-12d9-435d-9a93-17523086e4ff.mock.pstmn.io' + url;
+            return 'http://cmis-dashboard.feisystems.com:8080/PrescriptionService.svc' + url;
         };
     }
 })();
