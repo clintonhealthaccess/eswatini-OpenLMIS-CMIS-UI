@@ -131,6 +131,14 @@
         function onInit() {
             CmisRequestService.saveOath2Token();
             vm.date = $filter('isoDate')(new Date());
+            findSrcDesination();
+        }
+
+        function findSrcDesination() {
+            vm.srcDstAssignments = $filter('filter')(vm.srcDstAssignments, {
+                name: 'Lobamba - Child welfare'
+                // name: 'F.E. Patient'
+            });
         }
 
         function addOrRemoveMedication(medication) {
@@ -166,6 +174,7 @@
                 vm.selectedSubstitutes.splice(index, 1);
                 deleteSubstituteFromMedications(orderable);
                 orderable.quantity = null;
+                orderable.$errors = {};
             }
         }
 
@@ -242,7 +251,7 @@
         }
 
         function gatherCmisData() {
-
+            vm.selectedMedications = [];
             angular.forEach(vm.visit.prescriptions, function(prescription) {
                 angular.forEach(
                     prescription.medications,
