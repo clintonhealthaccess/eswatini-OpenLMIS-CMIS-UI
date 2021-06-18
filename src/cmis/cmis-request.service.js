@@ -67,22 +67,6 @@
          * @returns {Promise} Promise with GET request.
          */
         function doGet(url) {
-            // var dataPromise = null;
-            // var authHeader = buildRequestHeader();
-            // if (authHeader !== null) {
-            //     dataPromise = $http.get(
-            //         cmisUrlFactory(url)
-            //     ).defaults.headers.common.Authentication = authHeader
-            //         .then(function(response) {
-            //             return response.data;
-            //         })
-            //         .catch(function() {
-            //             return $q.reject();
-            //         });
-            // }
-            // var data = {
-            //     data: null
-            // };
             var dataPromise = $http
                 .get(cmisUrlFactory(url))
                 .then(function(response) {

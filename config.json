@@ -1,9 +1,15 @@
 {
     "orderedBuildDirectories": [
-        "/openlmis-ui-components",
-        "/openlmis-auth-ui",
-        "/openlmis-ui-layout",
-        "/openlmis-referencedata-ui",
-        "/openlmis-stockmanagement-ui"
+      "/openlmis-ui-components",
+      "/openlmis-ui-layout",
+      "/openlmis-auth-ui",
+      "/openlmis-referencedata-ui",
+      "/openlmis-report-ui",
+      "/openlmis-requisition-ui",
+      "/openlmis-fulfillment-ui",
+      "/openlmis-cce-ui",
+      "/openlmis-stockmanagement-ui",
+      "/openlmis-offline-ui",
+      "/eswatini-cmis-ui"
     ]
-}
+  }
