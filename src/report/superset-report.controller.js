@@ -28,9 +28,9 @@
         .module('report')
         .controller('SupersetReportController', SupersetReportController);
 
-    SupersetReportController.inject = ['reportCode', 'reportUrl'];
+    SupersetReportController.inject = ['reportCode', 'reportUrl', '$q', '$http', 'loadingModalService', '$sce'];
 
-    function SupersetReportController(reportCode, reportUrl) {
+    function SupersetReportController(reportCode, reportUrl, $q, $http, loadingModalService, $sce) {
         var vm = this;
         vm.$onInit = onInit;
 
@@ -78,10 +78,41 @@
          */
         vm.isReady = false;
 
+        vm.reportHTML = '';
+
         function onInit() {
+            loadingModalService.open();
             vm.reportCode = reportCode;
             vm.reportUrl = reportUrl;
+
             vm.isReady = true;
+
+            $q.resolve(doGet($sce.getTrustedUrl(vm.reportUrl)))
+                .then(function(response) {
+                    vm.reportHTML = response;
+                    loadingModalService.close();
+                });
+
+        }
+
+        function doGet(url) {
+            var dataPromise = $http
+                .get(url)
+                .then(function(response) {
+                    if (
+                        response.data.message ===
+                        'Wrong parameters or prescription expired'
+                    ) {
+                        return {
+                            data: {}
+                        };
+                    }
+                    return response.data;
+                })
+                .catch(function() {
+                    return $q.reject();
+                });
+            return dataPromise;
         }
 
     }
