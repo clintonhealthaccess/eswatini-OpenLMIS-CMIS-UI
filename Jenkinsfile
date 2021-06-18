@@ -48,7 +48,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                withCredentials([file(credentialsId: '8da5ba56-8ebb-4a6a-bdb5-43c9d0efb120', variable: 'ENV_FILE')]) {
+                withCredentials([file(credentialsId: 'ce28ee04-3ef5-47a0-aabc-8324f8c1f03a', variable: 'ENV_FILE')]) {
                     script {
                         try {
                             sh '''
