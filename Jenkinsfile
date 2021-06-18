@@ -22,7 +22,7 @@ pipeline {
                 checkout scm
 
                 withCredentials([usernamePassword(
-                  credentialsId: "cad2f741-7b1e-4ddd-b5ca-2959d40f62c2",
+                  credentialsId: "3a0472f4-49c1-4ab0-bca8-f2f9dc845ac6",
                   usernameVariable: "USER",
                   passwordVariable: "PASS"
                 )]) {
