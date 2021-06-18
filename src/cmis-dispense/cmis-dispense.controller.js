@@ -136,8 +136,8 @@
 
         function findSrcDesination() {
             vm.srcDstAssignments = $filter('filter')(vm.srcDstAssignments, {
-                name: 'Lobamba - Child welfare'
-                // name: 'F.E. Patient'
+                // name: 'Lobamba - Child welfare'
+                name: 'F.E. Patient'
             });
         }
 
