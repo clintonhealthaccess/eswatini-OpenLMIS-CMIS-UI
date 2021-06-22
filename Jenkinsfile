@@ -62,6 +62,7 @@ pipeline {
                                 docker-compose run --entrypoint /dev-ui/build.sh eswatini-cmis-ui
                                 docker-compose build image
                                 docker-compose down --volumes
+                                sudo rm -rf node_modules/
                             '''
                             currentBuild.result = processTestResults('SUCCESS')
                         }
@@ -90,79 +91,6 @@ pipeline {
                 }
             }
         }
-        stage('Build reference-ui') {
-            when {
-                expression {
-                    return "${env.GIT_BRANCH}" == 'master' && VERSION.endsWith("SNAPSHOT")
-                }
-            }
-            steps {
-                sh "docker tag clintonhealthaccess/eswatini-cmis-ui:latest clintonhealthaccess/eswatini-cmis-ui:${VERSION}"
-                sh "docker push clintonhealthaccess/eswatini-cmis-ui:${VERSION}"
-                build job: 'OpenLMIS-reference-ui-pipeline/master', wait: false
-            }
-            post {
-                failure {
-                    script {
-                        notifyAfterFailure()
-                    }
-                }
-            }
-        }
-        stage('Sonar analysis') {
-            when {
-                expression {
-                    return VERSION.endsWith("SNAPSHOT")
-                }
-            }
-            steps {
-                withSonarQubeEnv('Sonar OpenLMIS') {
-                    withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
-                        script {
-                            sh '''
-                                set +x
-
-                                sudo rm -f .env
-                                touch .env
-
-                                SONAR_LOGIN_TEMP=$(echo $SONAR_LOGIN | cut -f2 -d=)
-                                SONAR_PASSWORD_TEMP=$(echo $SONAR_PASSWORD | cut -f2 -d=)
-                                echo "SONAR_LOGIN=$SONAR_LOGIN_TEMP" >> .env
-                                echo "SONAR_PASSWORD=$SONAR_PASSWORD_TEMP" >> .env
-                                echo "SONAR_BRANCH=$GIT_BRANCH" >> .env
-
-                                docker-compose run --entrypoint ./sonar.sh eswatini-cmis-ui
-                                docker-compose down --volumes
-                                sudo rm -rf node_modules/
-                            '''
-                            // workaround because sonar plugin retrieve the path directly from the output
-                            sh 'echo "Working dir: ${WORKSPACE}/.sonar"'
-                        }
-                    }
-                }
-                timeout(time: 1, unit: 'HOURS') {
-                    script {
-                        def gate = waitForQualityGate()
-                        if (gate.status != 'OK') {
-                            echo 'Quality Gate FAILED'
-                            currentBuild.result = 'UNSTABLE'
-                        }
-                    }
-                }
-            }
-            post {
-                unstable {
-                    script {
-                        notifyAfterFailure()
-                    }
-                }
-                failure {
-                    script {
-                        notifyAfterFailure()
-                    }
-                }
-            }
-        }
         stage('Push image') {
             when {
                 expression {
@@ -170,8 +98,8 @@ pipeline {
                 }
             }
             steps {
-                sh "docker tag clintonhealthaccess/eswatini-cmis-ui:latest clintonhealthaccess/eswatini-cmis-ui:${VERSION}"
-                sh "docker push clintonhealthaccess/eswatini-cmis-ui:${VERSION}"
+                sh "docker tag kausamusa/eswatini-cmis-ui:latest kausamusa/eswatini-cmis-ui:${VERSION}"
+                sh "docker push kausamusa/eswatini-cmis-ui:${VERSION}"
             }
             post {
                 success {
