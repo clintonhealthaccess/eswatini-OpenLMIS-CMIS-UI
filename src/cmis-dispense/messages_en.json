@@ -20,5 +20,7 @@
     "cmisDispense.interval": "Interval",
     "cmisDispense.balance": "Balance",
     "cmisDispense.addSubstitute": "Add to substitutes",
+    "cmisDispense.destination": "Destination",
+    "cmisDispense.program": "Program",
     "cmisDispense.reason": "Reason"
 }
