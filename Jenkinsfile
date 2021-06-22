@@ -27,7 +27,7 @@ pipeline {
                   passwordVariable: "PASS"
                 )]) {
                     sh 'set +x'
-                    sh 'docker login -u $USER -p $PASS'
+                    sh 'docker login -u $USER - $PASS'
                 }
                 script {
                     def properties = readProperties file: 'project.properties'
@@ -189,16 +189,6 @@ pipeline {
             }
         }
     }
-    post {
-        fixed {
-            script {
-                BRANCH = "${env.GIT_BRANCH}".trim()
-                if (BRANCH.equals("master") || BRANCH.startsWith("rel-")) {
-                    slackSend color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Back to normal"
-                }
-            }
-        }
-    }
 }
 
 def notifyAfterFailure() {
@@ -206,13 +196,6 @@ def notifyAfterFailure() {
     if (currentBuild.result == 'UNSTABLE') {
         messageColor = 'warning'
     }
-    BRANCH = "${env.GIT_BRANCH}".trim()
-    if (BRANCH.equals("master") || BRANCH.startsWith("rel-")) {
-        slackSend color: "${messageColor}", message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} ${currentBuild.result} (<${env.BUILD_URL}|Open>)"
-    }
-    emailext subject: "${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} ${currentBuild.result}",
-        body: """<p>${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} ${currentBuild.result}</p><p>Check console <a href="${env.BUILD_URL}">output</a> to view the results.</p>""",
-        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']]
 }
 
 def processTestResults(status) {

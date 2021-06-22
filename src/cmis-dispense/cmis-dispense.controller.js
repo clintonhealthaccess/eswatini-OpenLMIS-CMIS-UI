@@ -99,7 +99,6 @@
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
-        vm.programs = vm.facility.supportedPrograms;
         vm.program = program;
         vm.visit = visit.data;
         vm.substituteTab = [];

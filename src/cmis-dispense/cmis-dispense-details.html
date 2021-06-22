@@ -32,3 +32,13 @@
     <label for="visitId">{{'cmisDispense.visitId' | message}}</label>
     <input id="visitId" type="text" ng-model="vm.visitId" ng-disabled="true"/>
 </fieldset>
+
+<fieldset class="form-group">
+    <label for="srcDestination">{{'cmisDispense.destination' | message}}</label>
+    <input id="srcDestination" type="text" ng-model="vm.srcDstAssignments[0].name" ng-disabled="true"/>
+</fieldset>
+
+<fieldset class="form-group">
+    <label for="program">{{'cmisDispense.program' | message}}</label>
+    <input id="program" type="text" ng-model="vm.program.name" ng-disabled="true"/>
+</fieldset>
