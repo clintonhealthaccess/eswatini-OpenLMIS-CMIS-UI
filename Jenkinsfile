@@ -27,7 +27,7 @@ pipeline {
                   passwordVariable: "PASS"
                 )]) {
                     sh 'set +x'
-                    sh 'docker login -u $USER -p $PASS'
+                    sh 'docker login -u $USER - $PASS'
                 }
                 script {
                     def properties = readProperties file: 'project.properties'
