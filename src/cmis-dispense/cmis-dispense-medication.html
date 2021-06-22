@@ -60,7 +60,7 @@
 <h2>{{'cmisDispense.substitute' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
     <table>
-        <caption ng-if="!vm.orderableGroup">{{'cmisDispense.noSubstituteFound' | message}}</caption>
+        <caption ng-if="vm.orderableGroup.length === 0">{{'cmisDispense.noSubstituteFound' | message}}</caption>
         <thead>
             <tr>
                 <th>{{'cmisDispense.name' | message}}</th>
