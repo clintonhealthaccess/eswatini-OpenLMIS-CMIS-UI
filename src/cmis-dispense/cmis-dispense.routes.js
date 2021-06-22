@@ -65,10 +65,13 @@
                     }
                     return $stateParams.visit;
                 },
-                orderableGroup: function(program, facility, orderableGroupService) {
-                    return orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
-                        program.id, facility.id, true
-                    );
+                orderableGroup: function(program, facility, orderableGroupService, $stateParams) {
+                    if (!$stateParams.orderableGroups) {
+                        return orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
+                            program.id, facility.id, true
+                        );
+                    }
+                    return $stateParams.orderableGroups;
                 },
                 reasons: function($stateParams, stockReasonsFactory, facility) {
                     if (_.isUndefined($stateParams.reasons)) {
