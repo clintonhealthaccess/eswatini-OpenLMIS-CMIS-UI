@@ -68,7 +68,10 @@
          */
         function doGet(url) {
             var dataPromise = $http
-                .get(cmisUrlFactory(url))
+                .get(cmisUrlFactory(url),
+                    {
+                        headers: {}
+                    })
                 .then(function(response) {
                     if (
                         response.data.message ===
