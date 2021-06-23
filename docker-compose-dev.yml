@@ -13,12 +13,14 @@ services:
       - auth-ui
       - referencedata-ui
       - stockmanagement-ui
+      - report-ui
       - ui-components
       - ui-layout
     depends_on:
       - auth-ui
       - referencedata-ui
       - stockmanagement-ui
+      - report-ui
       - ui-components
       - ui-layout
   auth-ui:
@@ -33,6 +35,10 @@ services:
     image: openlmis/stockmanagement-ui:2.1.0-SNAPSHOT
     volumes:
      - '/openlmis-stockmanagement-ui'
+  report-ui:
+    image: openlmis/report-ui:5.2.6
+    volumes:
+      - '/openlmis-report-ui'
   ui-components:
     image: openlmis/ui-components:7.2.6-SNAPSHOT
     volumes:
