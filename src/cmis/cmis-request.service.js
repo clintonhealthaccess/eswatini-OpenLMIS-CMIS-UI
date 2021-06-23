@@ -98,7 +98,10 @@
         function doPut(url, data) {
             var dataPromise = null;
             dataPromise = $http
-                .put(cmisUrlFactory(url), data)
+                .put(cmisUrlFactory(url), data,
+                    {
+                        headers: {}
+                    })
                 .then(function(response) {
                     return response.data;
                 })
