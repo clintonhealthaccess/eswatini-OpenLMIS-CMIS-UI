@@ -68,10 +68,7 @@
          */
         function doGet(url) {
             var dataPromise = $http
-                .get(cmisUrlFactory(url),
-                    {
-                        headers: {}
-                    })
+                .get(cmisUrlFactory(url))
                 .then(function(response) {
                     if (
                         response.data.message ===
@@ -98,10 +95,7 @@
         function doPut(url, data) {
             var dataPromise = null;
             dataPromise = $http
-                .put(cmisUrlFactory(url), data,
-                    {
-                        headers: {}
-                    })
+                .put(cmisUrlFactory(url), data)
                 .then(function(response) {
                     return response.data;
                 })

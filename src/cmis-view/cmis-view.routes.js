@@ -45,7 +45,7 @@
                 },
                 clients: function(CmisRequestService, facility) {
                     return CmisRequestService.getRequest('/prescription/clients/' +
-                    facility.code);
+                    facility.code.split('_')[0]);
                 }
             }
         });
