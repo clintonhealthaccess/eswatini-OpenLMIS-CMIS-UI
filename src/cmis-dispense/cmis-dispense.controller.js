@@ -100,9 +100,10 @@
         vm.user = user;
         vm.facility = facility;
         vm.program = program;
+        vm.programs = facility.supportedPrograms;
         vm.visit = visit.data;
         vm.substituteTab = [];
-        vm.orderableGroup = orderableGroup;
+        vm.orderableGroup = orderableGroup.data;
         vm.selectedSubstitutes = [];
         vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
@@ -141,7 +142,7 @@
 
         function addOrRemoveMedication(medication) {
 
-            var orderable = getOrderableByProductCode(medication.code);
+            var orderable = getOrderableByGenericName(medication.drug_name);
 
             if (!orderable && medication.$selected) {
                 medication.$errors = {};
@@ -150,7 +151,7 @@
             }
 
             if (medication.$selected) {
-                medication.orderable = orderable[0][0];
+                medication.orderable = orderable[0];
                 medication.quantity = calculateQuantity(medication);
                 // medication.orderable.quantity = medication.quantity;
                 medication.balance = medication.orderable.stockOnHand - medication.quantity;
@@ -176,15 +177,34 @@
             }
         }
 
-        function getOrderableByProductCode(productCode) {
+        // function getOrderableByProductCode(productCode) {
+        //
+        //     if (productCode) {
+        //         return $filter('filter')(vm.orderableGroup, {
+        //             orderable: {
+        //                 productCode: productCode
+        //             }
+        //         });
+        //     }
+        // }
 
-            if (productCode) {
-                return $filter('filter')(vm.orderableGroup, {
-                    orderable: {
-                        productCode: productCode
-                    }
+        function getOrderableByGenericName(productName) {
+            var orderable = null;
+            if (productName) {
+                vm.orderableGroup.forEach(function(group) {
+                    group.orderableGroup.forEach(function(orderables) {
+                        var tempOrderable = $filter('filter')(orderables, {
+                            orderable: {
+                                fullProductName: productName
+                            }
+                        });
+                        if (tempOrderable.length > 0) {
+                            orderable = tempOrderable;
+                        }
+                    });
                 });
             }
+            return orderable;
         }
 
         function deleteSubstituteFromMedications(substitute) {

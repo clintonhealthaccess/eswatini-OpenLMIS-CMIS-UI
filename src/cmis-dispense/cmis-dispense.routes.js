@@ -65,11 +65,26 @@
                     }
                     return $stateParams.visit;
                 },
-                orderableGroup: function(program, facility, orderableGroupService, $stateParams) {
+                orderableGroup: function(facility, orderableGroupService, $stateParams, $q) {
                     if (!$stateParams.orderableGroups) {
-                        return orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
-                            program.id, facility.id, true
-                        );
+                        var tempObject = [];
+                        var data = [];
+                        facility.supportedPrograms.forEach(function(program) {
+                            $q.resolve(
+                                orderableGroupService.findAvailableProductsAndCreateOrderableGroups(
+                                    program.id, facility.id, true
+                                )
+                            ).then(function(response) {
+                                tempObject = {
+                                    program: program,
+                                    orderableGroup: response
+                                };
+                                data.push(tempObject);
+                            });
+                        });
+                        return {
+                            data: data
+                        };
                     }
                     return $stateParams.orderableGroups;
                 },

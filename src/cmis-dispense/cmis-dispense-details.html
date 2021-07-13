@@ -42,3 +42,10 @@
     <label for="program">{{'cmisDispense.program' | message}}</label>
     <input id="program" type="text" ng-model="vm.program.name" ng-disabled="true"/>
 </fieldset>
+<fieldset class="form-group">
+    <label for="program">{{'cmisDispense.program' | message}}</label>
+    <select
+            ng-model="vm.selectedProgram"
+            ng-options="program.name for program in vm.programs">
+    </select>
+</fieldset>
