@@ -33,6 +33,7 @@
     "report.superset.productStockout": "Product Stockout Dashboard",
     "report.superset.inventoryReportByFacility": "Inventory Report by Facility Dashboard",
     "report.superset.OrderFillRate": "Order Fill Rate Dashboard",
-    "report.superset.AdjustmentSummary": "Adjustment Summary Dashboard"
+    "report.superset.AdjustmentSummary": "Adjustment Summary Dashboard",
+    "report.superset.medicationCost": "Medication Cost Dashboard"
 
 }
