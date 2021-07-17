@@ -46,6 +46,9 @@
                 ''),
             ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
                 'http://34.207.216.185:9000/superset/dashboard/1/',
+                ''),
+            MEDICATION_COST: createReport('medicationCost',
+                'http://34.207.216.185:9000/superset/dashboard/6/',
                 '')
         };
 
