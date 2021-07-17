@@ -7,6 +7,7 @@
             <tr>
                 <th></th>
                 <th>{{'cmisDispense.name' | message}}</th>
+                <th>{{'cmisDispense.olmisName' | message}}</th>
                 <th>{{'cmisDispense.dose' | message}}</th>
                 <th>{{'cmisDispense.duration' | message}}</th>
                 <th>{{'cmisDispense.interval' | message}}</th>
@@ -25,6 +26,12 @@
                         ng-change="vm.addOrRemoveMedication(medication)"/>
                 </td>
                 <td>{{medication.drug_name}}</td>
+                <td>
+                    <select ng-disabled="!medication.$selected"
+                            ng-model="medication.selectedOrderable"
+                            ng-options="option.orderable.fullProductName for option in medication.orderables">
+                    </select>
+                </td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
                 <td>
@@ -43,7 +50,16 @@
                             style="width: 15%;">
                     </div>
                 </td>
-                <td openlmis-invalid="{{medication.$errors.noOrderable ? 'openlmisForm.required' : '' | message}}">{{ (medication.$errors.noOrderable) ? medication.$errors.noOrderable : medication.orderable.stockOnHand}}</td>
+                <td openlmis-invalid="{{medication.$errors.noOrderable ? 'openlmisForm.required' : '' | message}}">
+                    {{
+                        (medication.$errors.noOrderable) ? medication.$errors.noOrderable :
+                        $filter('filter')(medication.orderable, {
+                            orderable: {
+                                $selected: true
+                            }
+                        }).stockOnHand
+                    }}
+                </td>
                 <td>{{medication.balance}}</td>
                 <td>{{medication.quantity=vm.calculateQuantity(medication)}}</td>
                 <td>
@@ -71,7 +87,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="groups in vm.orderableGroup">
+            <tr ng-repeat="groups in vm.orderableGroup[vm.orderableGroupIndex].orderableGroup">
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input

@@ -99,8 +99,8 @@
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
-        vm.program = program;
         vm.programs = facility.supportedPrograms;
+        vm.selectedProgram = program;
         vm.visit = visit.data;
         vm.substituteTab = [];
         vm.orderableGroup = orderableGroup.data;
@@ -109,16 +109,16 @@
         vm.srcDstAssignments = srcDstAssignments;
         vm.reasons = reasons;
         vm.selectedMedications = [];
-
+        vm.orderableGroupIndex = 0;
         vm.date = '';
         vm.reason = '';
         vm.notes = '';
 
-        // vm.addSubstitute = addSubstitute;
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveSubstitute = addOrRemoveSubstitute;
         vm.calculateQuantity = calculateQuantity;
+        vm.updateOrderableIndex = updateOrderableIndex;
 
         /**
          * @ngdoc method
@@ -142,22 +142,25 @@
 
         function addOrRemoveMedication(medication) {
 
-            var orderable = getOrderableByGenericName(medication.drug_name);
+            var orderables = getOrderablesByGenericName(medication.drug_name);
 
-            if (!orderable && medication.$selected) {
+            if (orderables.length === 0 && medication.$selected) {
                 medication.$errors = {};
                 medication.$errors.noOrderable = 'No product found';
                 return;
             }
 
             if (medication.$selected) {
-                medication.orderable = orderable[0];
+                if (orderables.length === 1) {
+                    medication.selectedOrderable = orderables[0];
+                }
+                medication.orderables = orderables;
                 medication.quantity = calculateQuantity(medication);
-                // medication.orderable.quantity = medication.quantity;
-                medication.balance = medication.orderable.stockOnHand - medication.quantity;
+                medication.balance = medication.selectedOrderable.stockOnHand - medication.quantity;
             } else {
                 medication.$errors = null;
-                medication.orderable = null;
+                medication.selectedOrderable = null;
+                medication.orderables = null;
                 medication.quantity = null;
                 medication.balance = null;
                 medication.substitute = null;
@@ -177,33 +180,31 @@
             }
         }
 
-        // function getOrderableByProductCode(productCode) {
-        //
-        //     if (productCode) {
-        //         return $filter('filter')(vm.orderableGroup, {
-        //             orderable: {
-        //                 productCode: productCode
-        //             }
-        //         });
-        //     }
-        // }
-
-        function getOrderableByGenericName(productName) {
-            var orderable = null;
+        function getOrderablesByGenericName(productName) {
+            var orderables = null;
             if (productName) {
-                vm.orderableGroup.forEach(function(group) {
-                    group.orderableGroup.forEach(function(orderables) {
-                        var tempOrderable = $filter('filter')(orderables, {
-                            orderable: {
-                                fullProductName: productName
-                            }
-                        });
-                        if (tempOrderable.length > 0) {
-                            orderable = tempOrderable;
+                orderables = findOrderables(productName);
+                if (orderables === null || orderables.length === 0) {
+                    return findOrderables(productName.substring(0, 5));
+                }
+            }
+            return orderables;
+        }
+
+        function findOrderables(productName) {
+            var orderable = [];
+            vm.orderableGroup.forEach(function(group) {
+                group.orderableGroup.forEach(function(orderables) {
+                    var tempOrderable = $filter('filter')(orderables, {
+                        orderable: {
+                            fullProductName: productName
                         }
                     });
+                    if (tempOrderable.length > 0) {
+                        orderable.push(tempOrderable[0]);
+                    }
                 });
-            }
+            });
             return orderable;
         }
 
@@ -324,7 +325,7 @@
                             success = false;
                             return;
                         }
-                        orderable = medication.orderable;
+                        orderable = medication.selectedOrderable;
                         orderable.quantity = medication.quantity;
                     }
 
@@ -406,7 +407,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateQuantity
          *
          * @description
@@ -431,7 +432,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateAssignment
          *
          * @description
@@ -449,7 +450,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateReason
          *
          * @description
@@ -466,7 +467,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateDate
          *
          * @description
@@ -481,7 +482,7 @@
 
         /**
          * @ngdoc property
-         * @propertyOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @propertyOf cmis-dispense.controller:CmisDispenseController
          * @name offline
          * @type {boolean}
          *
@@ -489,6 +490,25 @@
          * Holds information about internet connection
          */
         vm.offline = offlineService.isOffline;
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name updateOrderableIndex
+         *
+         * @description
+         * Validate line item occurred date and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        function updateOrderableIndex() {
+
+            vm.orderableGroup.forEach(function(group, index) {
+                if (group.program.id === vm.selectedProgram.id) {
+                    vm.orderableGroupIndex = index;
+                }
+            });
+        }
 
         vm.key = function(secondaryKey) {
             return adjustmentType.prefix + 'Creation.' + secondaryKey;
