@@ -117,8 +117,9 @@
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveSubstitute = addOrRemoveSubstitute;
-        vm.calculateQuantity = calculateQuantity;
         vm.updateOrderableIndex = updateOrderableIndex;
+        vm.showSoHorError = showSoHorError;
+        vm.refreshMedicationData = refreshMedicationData;
 
         /**
          * @ngdoc method
@@ -141,11 +142,12 @@
         }
 
         function addOrRemoveMedication(medication) {
+            medication.$errors = {};
+            cleanErrors(medication);
 
             var orderables = getOrderablesByGenericName(medication.drug_name);
 
             if (orderables.length === 0 && medication.$selected) {
-                medication.$errors = {};
                 medication.$errors.noOrderable = 'No product found';
                 return;
             }
@@ -156,28 +158,75 @@
                 }
                 medication.orderables = orderables;
                 medication.quantity = calculateQuantity(medication);
-                medication.balance = medication.selectedOrderable.stockOnHand - medication.quantity;
+                refreshMedicationData(medication);
+
             } else {
-                medication.$errors = null;
-                medication.selectedOrderable = null;
-                medication.orderables = null;
-                medication.quantity = null;
-                medication.balance = null;
-                medication.substitute = null;
+                cleanMedcationData(medication);
             }
         }
 
-        function addOrRemoveSubstitute(orderable) {
+        function refreshMedicationData(medication) {
 
-            if (orderable.$selected) {
-                vm.selectedSubstitutes.push(orderable);
-            } else {
-                var index = vm.selectedSubstitutes.indexOf(orderable);
-                vm.selectedSubstitutes.splice(index, 1);
-                deleteSubstituteFromMedications(orderable);
-                orderable.quantity = null;
-                orderable.$errors = {};
+            if (!medication.selectedOrderable) {
+                cleanErrors(medication);
+                medication.balance = null;
+                return;
             }
+
+            if (medication.selectedOrderable.stockOnHand) {
+                medication.$errors.noStockOnHand = null;
+                medication.$errors.noOrderable = null;
+
+                var balance = calculateBalance(medication);
+                if (balance < 0) {
+                    medication.$errors.balanceBelowZero = 'Balance below zero';
+                } else {
+                    medication.$errors.balanceBelowZero = null;
+                }
+                medication.balance = balance;
+            } else {
+                medication.$errors.noStockOnHand = 'Product doesn\'t have Stock on hand.';
+            }
+        }
+
+        function cleanErrors(medication) {
+            medication.$errors.noStockOnHand = null;
+            medication.$errors.noOrderable = null;
+            medication.$errors.balanceBelowZero = null;
+        }
+        function cleanMedcationData(medication) {
+            cleanErrors(medication);
+            medication.selectedOrderable = null;
+            medication.orderables = null;
+            medication.quantity = null;
+            medication.balance = null;
+            medication.substitute = null;
+        }
+
+        function calculateBalance(medication) {
+            return medication.selectedOrderable.stockOnHand - medication.quantity;
+        }
+
+        function calculateQuantity(medication) {
+            var dose = parseInt(medication.dose, 10);
+            var duration = parseInt(medication.duration, 10);
+            var intervalType = INTERVAL.type[medication.interval];
+            var quantity = 0;
+
+            if (intervalType === INTERVAL.type.wd) {
+                var weeklyDays = CmisIntervalService.countWeeklyDays(duration);
+
+                quantity = (dose * weeklyDays);
+
+                return quantity;
+            }
+            if (intervalType === INTERVAL.type.pm) {
+                medication.hasOwnInterval = true;
+                quantity = (dose * duration * medication.ownInterval);
+                return quantity;
+            }
+            quantity = (dose * duration * intervalType);
+            return quantity;
         }
 
         function getOrderablesByGenericName(productName) {
@@ -201,11 +250,25 @@
                         }
                     });
                     if (tempOrderable.length > 0) {
+                        tempOrderable[0].program = group.program;
                         orderable.push(tempOrderable[0]);
                     }
                 });
             });
             return orderable;
+        }
+
+        function addOrRemoveSubstitute(orderable) {
+
+            if (orderable.$selected) {
+                vm.selectedSubstitutes.push(orderable);
+            } else {
+                var index = vm.selectedSubstitutes.indexOf(orderable);
+                vm.selectedSubstitutes.splice(index, 1);
+                deleteSubstituteFromMedications(orderable);
+                orderable.quantity = null;
+                orderable.$errors = {};
+            }
         }
 
         function deleteSubstituteFromMedications(substitute) {
@@ -325,6 +388,19 @@
                             success = false;
                             return;
                         }
+
+                        if (medication.$errors.noStockOnHand === 'Product does\'nt have Stock on hand.') {
+                            alertService.error('You can not dispense medication without Stock on hand.');
+                            success = false;
+                            return;
+                        }
+
+                        if (medication.$errors.balanceBelowZero === 'Balance below zero') {
+                            alertService.error('Balance can\'t be below zero.');
+                            success = false;
+                            return;
+                        }
+
                         orderable = medication.selectedOrderable;
                         orderable.quantity = medication.quantity;
                     }
@@ -502,39 +578,41 @@
          * @param {Object} lineItem line item to be validated.
          */
         function updateOrderableIndex() {
-
+            loadingModalService.open();
             vm.orderableGroup.forEach(function(group, index) {
                 if (group.program.id === vm.selectedProgram.id) {
                     vm.orderableGroupIndex = index;
                 }
             });
+            loadingModalService.close();
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name showSoHorError
+         *
+         * @description
+         * Show stock on hand value or show error.
+         *
+         * @param {Object} medication medication to whom will be soh shown.
+         */
+
+        function showSoHorError(medication) {
+            if (!medication.$errors) {
+                return;
+            } else if (medication.$errors.noOrderable) {
+                return medication.$errors.noOrderable;
+            } else if (medication.$errors.noStockOnHand) {
+                return medication.$errors.noStockOnHand;
+            } else if (medication.selectedOrderable && medication.selectedOrderable.stockOnHand) {
+                return medication.selectedOrderable.stockOnHand;
+            }
         }
 
         vm.key = function(secondaryKey) {
             return adjustmentType.prefix + 'Creation.' + secondaryKey;
         };
-
-        function calculateQuantity(medication) {
-            var dose = parseInt(medication.dose, 10);
-            var duration = parseInt(medication.duration, 10);
-            var intervalType = INTERVAL.type[medication.interval];
-            var quantity = 0;
-
-            if (intervalType === INTERVAL.type.wd) {
-                var weeklyDays = CmisIntervalService.countWeeklyDays(duration);
-
-                quantity = (dose * weeklyDays);
-
-                return quantity;
-            }
-            if (intervalType === INTERVAL.type.pm) {
-                medication.hasOwnInterval = true;
-                quantity = (dose * duration * medication.ownInterval);
-                return quantity;
-            }
-            quantity = (dose * duration * intervalType);
-            return quantity;
-        }
 
         function save() {
 

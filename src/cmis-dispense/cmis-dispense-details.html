@@ -37,12 +37,3 @@
     <label for="srcDestination">{{'cmisDispense.destination' | message}}</label>
     <input id="srcDestination" type="text" ng-model="vm.srcDstAssignments[0].name" ng-disabled="true"/>
 </fieldset>
-
-<fieldset class="form-group">
-    <label for="selectedProgram">{{'cmisDispense.program' | message}}</label>
-    <select
-            ng-model="vm.selectedProgram"
-            ng-change="vm.updateOrderableIndex()"
-            ng-options="program.name for program in vm.programs">
-    </select>
-</fieldset>
