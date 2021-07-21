@@ -102,6 +102,7 @@
         vm.programs = facility.supportedPrograms;
         vm.selectedProgram = program;
         vm.visit = visit.data;
+        vm.adjustmentType = adjustmentType;
         vm.substituteTab = [];
         vm.orderableGroup = orderableGroup.data;
         vm.selectedSubstitutes = [];
@@ -166,6 +167,7 @@
         }
 
         function refreshMedicationData(medication) {
+            medication.quantity = calculateQuantity(medication);
 
             if (!medication.selectedOrderable) {
                 cleanErrors(medication);
@@ -261,6 +263,7 @@
         function addOrRemoveSubstitute(orderable) {
 
             if (orderable.$selected) {
+                orderable.program = vm.selectedProgram;
                 vm.selectedSubstitutes.push(orderable);
             } else {
                 var index = vm.selectedSubstitutes.indexOf(orderable);
@@ -287,7 +290,21 @@
 
             // generateKitConstituentLineItem(addedLineItems);
 
-            stockAdjustmentCreationService.submitAdjustments(program.id, facility.id, addedLineItems, adjustmentType)
+            vm.programs.forEach(function(program) {
+                var lineItems = $filter('filter')(addedLineItems, {
+                    program: {
+                        id: program.id
+                    }
+                });
+                if (lineItems.length > 0) {
+                    submit(program, lineItems);
+                }
+            });
+        }
+
+        function submit(program, addedLineItems) {
+            stockAdjustmentCreationService
+                .submitAdjustments(program.id, vm.facility.id, addedLineItems, vm.adjustmentType)
                 .then(function() {
                     if (offlineService.isOffline()) {
                         notificationService.offline(vm.key('submittedOffline'));
@@ -408,7 +425,7 @@
                     orderable.$errors = {};
                     orderable.$previewSOH = orderable.stockOnHand;
                     orderable.assignment = vm.srcDstAssignments[0];
-                    orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
+                    orderable.reason = (vm.adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
                         ? {
                             id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
                         } : vm.reasons[0];
@@ -517,8 +534,8 @@
          * @param {Object} lineItem line item to be validated.
          */
         vm.validateAssignment = function(lineItem) {
-            if (adjustmentType.state !== ADJUSTMENT_TYPE.ADJUSTMENT.state &&
-                adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
+            if (vm.adjustmentType.state !== ADJUSTMENT_TYPE.ADJUSTMENT.state &&
+                vm.adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
                 lineItem.$errors.assignmentInvalid = isEmpty(lineItem.assignment);
             }
             return lineItem;
@@ -535,7 +552,7 @@
          * @param {Object} lineItem line item to be validated.
          */
         vm.validateReason = function(lineItem) {
-            if (adjustmentType.state === 'adjustment') {
+            if (vm.adjustmentType.state === 'adjustment') {
                 lineItem.$errors.reasonInvalid = isEmpty(lineItem.reason);
             }
             return lineItem;
@@ -611,7 +628,7 @@
         }
 
         vm.key = function(secondaryKey) {
-            return adjustmentType.prefix + 'Creation.' + secondaryKey;
+            return vm.adjustmentType.prefix + 'Creation.' + secondaryKey;
         };
 
         function save() {

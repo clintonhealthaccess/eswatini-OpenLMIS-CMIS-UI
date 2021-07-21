@@ -48,6 +48,7 @@
                             ng-disabled="!medication.$selected"
                             ng-model="medication.ownInterval"
                             ng-init="medication.ownInterval=0"
+                            ng-change="vm.refreshMedicationData(medication)"
                             min="0"
                             step="1"
                             style="width: 15%;">
