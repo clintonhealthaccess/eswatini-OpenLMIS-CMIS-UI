@@ -28,7 +28,7 @@
                 </td>
                 <td>{{medication.drug_name}}</td>
                 <td>
-                    <select ng-disabled="!medication.$selected"
+                    <select ng-disabled="!medication.$selected || medication.substitute"
                             ng-model="medication.selectedOrderable"
                             ng-change="vm.refreshMedicationData(medication)"
                             ng-options="option.orderable.fullProductName for option in medication.orderables">
@@ -58,12 +58,13 @@
                     {{ vm.showSoHorError(medication) }}
                 </td>
                 <td openlmis-invalid="{{medication.$errors.balanceBelowZero ? 'openlmisForm.formInvalid' : '' | message}}">
-                    {{medication.balance }}
+                    {{vm.showBalance(medication)}}
                 </td>
-                <td>{{medication.quantity}}</td>
+                <td>{{medication.quantity = vm.calculateQuantity(medication)}}</td>
                 <td>
                     <select ng-disabled="!medication.$selected"
                         ng-model="medication.substitute"
+                        ng-change="vm.removeProductWhenSubstitue(medication)"
                         ng-options="option.orderable.fullProductName for option in vm.selectedSubstitutes">
                     </select>
                 </td>
@@ -104,6 +105,7 @@
                         ng-disabled="!groups[0].$selected"
                         max="{{groups[0].stockOnHand}}"
                         step="1"
+                        ng-change="{{ groups[0].$errors.quantityInvalid = null}}"
                         openlmis-invalid="{{groups[0].$errors.quantityInvalid ? 'openlmisForm.required' : '' | message}}"
                         ng-model="groups[0].quantity"/>
                 </td>

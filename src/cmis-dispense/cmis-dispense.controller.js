@@ -118,9 +118,12 @@
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveSubstitute = addOrRemoveSubstitute;
+        vm.removeProductWhenSubstitue = removeProductWhenSubstitue;
         vm.updateOrderableIndex = updateOrderableIndex;
         vm.showSoHorError = showSoHorError;
         vm.refreshMedicationData = refreshMedicationData;
+        vm.calculateQuantity = calculateQuantity;
+        vm.showBalance = showBalance;
 
         /**
          * @ngdoc method
@@ -158,36 +161,28 @@
                     medication.selectedOrderable = orderables[0];
                 }
                 medication.orderables = orderables;
-                medication.quantity = calculateQuantity(medication);
                 refreshMedicationData(medication);
 
             } else {
-                cleanMedcationData(medication);
+                cleanMedicationData(medication);
             }
         }
 
         function refreshMedicationData(medication) {
-            medication.quantity = calculateQuantity(medication);
-
             if (!medication.selectedOrderable) {
                 cleanErrors(medication);
                 medication.balance = null;
+                medication.$errors.noOrderable = 'No product found';
                 return;
             }
 
             if (medication.selectedOrderable.stockOnHand) {
                 medication.$errors.noStockOnHand = null;
                 medication.$errors.noOrderable = null;
-
-                var balance = calculateBalance(medication);
-                if (balance < 0) {
-                    medication.$errors.balanceBelowZero = 'Balance below zero';
-                } else {
-                    medication.$errors.balanceBelowZero = null;
-                }
-                medication.balance = balance;
+                calculateBalance(medication);
             } else {
                 medication.$errors.noStockOnHand = 'Product doesn\'t have Stock on hand.';
+                medication.balance = null;
             }
         }
 
@@ -196,17 +191,23 @@
             medication.$errors.noOrderable = null;
             medication.$errors.balanceBelowZero = null;
         }
-        function cleanMedcationData(medication) {
+        function cleanMedicationData(medication) {
             cleanErrors(medication);
             medication.selectedOrderable = null;
             medication.orderables = null;
-            medication.quantity = null;
             medication.balance = null;
             medication.substitute = null;
         }
 
         function calculateBalance(medication) {
-            return medication.selectedOrderable.stockOnHand - medication.quantity;
+            var balance = medication.selectedOrderable.stockOnHand - medication.quantity;
+
+            if (balance < 0) {
+                medication.$errors.balanceBelowZero = 'Balance below zero';
+            } else {
+                medication.$errors.balanceBelowZero = null;
+            }
+            medication.balance = balance;
         }
 
         function calculateQuantity(medication) {
@@ -271,6 +272,13 @@
                 deleteSubstituteFromMedications(orderable);
                 orderable.quantity = null;
                 orderable.$errors = {};
+            }
+        }
+
+        function removeProductWhenSubstitue(medication) {
+            if (medication.substitute) {
+                medication.selectedOrderable = null;
+                cleanErrors(medication);
             }
         }
 
@@ -622,9 +630,38 @@
                 return medication.$errors.noOrderable;
             } else if (medication.$errors.noStockOnHand) {
                 return medication.$errors.noStockOnHand;
+            } else if (!medication.selectedOrderable && medication.substitute) {
+                return 'From Substitute: ' + medication.substitute.stockOnHand;
             } else if (medication.selectedOrderable && medication.selectedOrderable.stockOnHand) {
                 return medication.selectedOrderable.stockOnHand;
             }
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name showBalance
+         *
+         * @description
+         * Show balance value or show error.
+         *
+         * @param {Object} medication medication to whom will be balance shown.
+         */
+
+        function showBalance(medication) {
+            if (!medication.$errors) {
+                return;
+            } else if (medication.$errors.balanceBelowZero) {
+                return medication.$errors.balanceBelowZero;
+            } else if (medication.substitute) {
+                medication.balance = 'From substitute: ' + medication.substitute.balance;
+            } else if (medication.selectedOrderable) {
+                calculateBalance(medication);
+            } else {
+                medication.balance = null;
+            }
+
+            return medication.balance;
         }
 
         vm.key = function(secondaryKey) {
