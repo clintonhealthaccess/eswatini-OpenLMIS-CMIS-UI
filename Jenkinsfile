@@ -93,11 +93,11 @@ pipeline {
             }
         }
         stage('Push image') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'master' || env.GIT_BRANCH =~ /rel-.+/
-                }
-            }
+//             when {
+//                 expression {
+//                     return env.GIT_BRANCH == 'master' || env.GIT_BRANCH =~ /rel-.+/
+//                 }
+//             }
             steps {
                 sh "docker tag kausamusa/eswatini-cmis-ui:latest kausamusa/eswatini-cmis-ui:${VERSION}"
                 sh "docker push kausamusa/eswatini-cmis-ui:${VERSION}"
