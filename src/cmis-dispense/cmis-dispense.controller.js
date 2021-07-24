@@ -686,6 +686,7 @@
 
             confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
                 loadingModalService.open();
+
                 $q.resolve(
                     CmisRequestService.putRequest(
                         '/prescription/client/dispense',
@@ -694,11 +695,17 @@
                         }
                     )
                 ).then(function(cmisResponse) {
-                    notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
+
+                    if (cmisResponse.status === 200) {
+                        notificationService.success('Succesfully dispensed! Response: ' + cmisResponse.data);
+                        submitToStock();
+                    } else {
+                        notificationService.error('There was an error while dispensing. Error: ' + cmisResponse.data);
+                    }
 
                 })
                     .then(function() {
-                        submitToStock();
+                        loadingModalService.close();
                     });
             });
         }

@@ -7,6 +7,7 @@
             <tr>
                 <th></th>
                 <th>{{'cmisDispense.name' | message}}</th>
+                <th>{{'cmisDispense.productCode' | message}}</th>
                 <th>{{'cmisDispense.olmisName' | message}}</th>
                 <th>{{'cmisDispense.program' | message}}</th>
                 <th>{{'cmisDispense.dose' | message}}</th>
@@ -27,11 +28,12 @@
                         ng-change="vm.addOrRemoveMedication(medication)"/>
                 </td>
                 <td>{{medication.drug_name}}</td>
+                <td>{{medication.drug_code}}</td>
                 <td>
                     <select ng-disabled="!medication.$selected || medication.substitute"
                             ng-model="medication.selectedOrderable"
                             ng-change="vm.refreshMedicationData(medication)"
-                            ng-options="option.orderable.fullProductName for option in medication.orderables">
+                            ng-options="option.orderable.productCode + ' - ' + option.orderable.fullProductName for option in medication.orderables">
                     </select>
                 </td>
                 <td>{{medication.selectedOrderable.program.name}}</td>
