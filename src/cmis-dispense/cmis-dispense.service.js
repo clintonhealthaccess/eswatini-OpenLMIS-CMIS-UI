@@ -42,6 +42,17 @@
         this.calculateQuantity = calculateQuantity;
         this.removeProductWhenSubstitue = removeProductWhenSubstitue;
 
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.service:CmisDispenseService
+         * @name showSoHorError
+         *
+         * @description
+         * Show stock on hand value or show error.
+         *
+         * @param {Object} medication medication to whom will be soh shown.
+         */
+
         function showSoHorError(medication) {
             if (!medication.$errors) {
                 return;
@@ -55,6 +66,17 @@
                 return medication.selectedOrderable.stockOnHand;
             }
         }
+
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.service:CmisDispenseService
+         * @name showBalance
+         *
+         * @description
+         * Show balance value or show error.
+         *
+         * @param {Object} medication medication to whom will be balance shown.
+         */
 
         function showBalance(medication) {
             if (!medication.$errors) {
