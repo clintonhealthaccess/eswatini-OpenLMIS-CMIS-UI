@@ -8,6 +8,7 @@
     "cmisDispense.visitId": "Visit ID",
     "cmisDispense.medications": "Medications",
     "cmisDispense.name": "Name",
+    "cmisDispense.olmisName": "OLMIS Name",
     "cmisDispense.dose": "Dose",
     "cmisDispense.duration": "Duration/Days",
     "cmisDispense.substitute": "Substitute",
@@ -22,5 +23,6 @@
     "cmisDispense.addSubstitute": "Add to substitutes",
     "cmisDispense.destination": "Destination",
     "cmisDispense.program": "Program",
-    "cmisDispense.reason": "Reason"
+    "cmisDispense.reason": "Reason",
+    "cmisDispense.productCode": "Product Code"
 }
