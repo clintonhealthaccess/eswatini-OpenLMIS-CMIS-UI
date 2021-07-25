@@ -28,27 +28,29 @@
         .module('report')
         .factory('supersetReports', supersetReports);
 
-    function supersetReports() {
+    supersetReports.$inject = ['SUPERSET_URL'];
+
+    function supersetReports(SUPERSET_URL) {
         var reports = {};
-
-        reports = {
-            PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/3/',
-                ''),
-            PRODUCT_STOCKOUT: createReport('productStockout',
-                'http://34.207.216.185:9000/superset/dashboard/2/',
-                ''),
-            INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/5/',
-                ''),
-            ORDER_FILL_RATE: createReport('OrderFillRate',
-                'http://34.207.216.185:9000/superset/dashboard/4/',
-                ''),
-            ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                'http://34.207.216.185:9000/superset/dashboard/1/',
-                '')
-        };
-
+        if (true) {
+            reports = {
+                PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
+                    'http://34.207.216.185:9000/superset/dashboard/3/',
+                    ''),
+                PRODUCT_STOCKOUT: createReport('productStockout',
+                    'http://34.207.216.185:9000/superset/dashboard/2/',
+                    ''),
+                INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
+                    'http://34.207.216.185:9000/superset/dashboard/5/',
+                    ''),
+                ORDER_FILL_RATE: createReport('OrderFillRate',
+                    'http://34.207.216.185:9000/superset/dashboard/4/',
+                    ''),
+                ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
+                    'http://34.207.216.185:9000/superset/dashboard/1/',
+                    '')
+            };
+        }
         return {
             getReports: getReports,
             addReporingPages: addReporingPages
@@ -89,7 +91,8 @@
                     },
                     reportCode: function() {
                         return report.code;
-                    }
+                    },
+                    authorizationInSuperset: authorizeInSuperset
                 }
             });
         }
@@ -104,6 +107,26 @@
                 url: url + '?standalone=true',
                 right: right
             };
+        }
+
+        function authorizeInSuperset(loadingModalService, openlmisModalService, $q, $state, MODAL_CANCELLED) {
+            loadingModalService.close();
+            var dialog = openlmisModalService.createDialog({
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'SupersetOAuthLoginController',
+                controllerAs: 'vm',
+                templateUrl: 'report/superset-oauth-login.html',
+                show: true
+            });
+            return dialog.promise
+                .catch(function(reason) {
+                    if (reason === MODAL_CANCELLED) {
+                        $state.go('openlmis.reports.list');
+                        return $q.resolve();
+                    }
+                    return $q.reject();
+                });
         }
     }
 
