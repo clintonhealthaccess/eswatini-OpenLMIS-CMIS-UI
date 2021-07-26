@@ -46,9 +46,9 @@
                     }
                     return $stateParams.facility;
                 },
-                program: function($stateParams, facility) {
+                program: function($stateParams, facility, $filter) {
                     if (_.isUndefined($stateParams.program)) {
-                        return facility.supportedPrograms[0];
+                        return $filter('orderBy')(facility.supportedPrograms, 'name')[0];
                     }
                     return $stateParams.program;
                 },
