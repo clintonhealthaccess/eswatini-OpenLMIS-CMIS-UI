@@ -133,6 +133,7 @@
          * Initialization method of the CmisDispenseController.
          */
         function onInit() {
+            updateOrderableIndex();
             CmisRequestService.saveOath2Token();
             vm.date = $filter('isoDate')(new Date());
             findSrcDestination();
