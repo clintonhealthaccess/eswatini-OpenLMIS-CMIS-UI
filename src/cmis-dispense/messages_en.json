@@ -23,6 +23,5 @@
     "cmisDispense.addSubstitute": "Add to substitutes",
     "cmisDispense.destination": "Destination",
     "cmisDispense.program": "Program",
-    "cmisDispense.reason": "Reason",
-    "cmisDispense.productCode": "Product Code"
+    "cmisDispense.reason": "Reason"
 }
