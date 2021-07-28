@@ -49,6 +49,9 @@
                 ''),
             MEDICATION_COST: createReport('medicationCost',
                 'http://34.207.216.185:9000/superset/dashboard/6/',
+                ''),
+            EXTERNAL_REPORT: createReport('externalReport',
+                'http://3.88.150.68:8088/r/1',
                 '')
         };
 
