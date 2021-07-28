@@ -28,9 +28,7 @@
         .module('report')
         .factory('supersetReports', supersetReports);
 
-    supersetReports.$inject = ['SUPERSET_URL'];
-
-    function supersetReports(SUPERSET_URL) {
+    function supersetReports() {
         var reports = {};
 
         reports = {
