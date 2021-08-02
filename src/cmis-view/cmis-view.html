@@ -9,6 +9,8 @@
             <input type="text" id="patientLastName" ng-model="vm.patientClientId"/>
             <label for="patientId">{{'cmisView.patientId' | message}}</label>
             <input type="text" id="patientId" ng-model="vm.patientId"/>
+            <label for="date">{{'cmisView.date' | message}}</label>
+            <input type="date" id="date" ng-model="vm.date" max-date="vm.maxDate"/>
             <input type="submit" class="btn btn-primary" value="{{'cmisView.search' | message}}"/>
         </form>
         <table>

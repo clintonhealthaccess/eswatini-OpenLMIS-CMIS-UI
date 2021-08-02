@@ -9,5 +9,6 @@
     "cmisView.clientId": "Client ID",
     "cmisView.patientId": "Patient ID",
     "cmisView.actions": "Actions",
-    "cmisView.dispense": "Dispense"
+    "cmisView.dispense": "Dispense",
+    "cmisView.date": "Date"
 }

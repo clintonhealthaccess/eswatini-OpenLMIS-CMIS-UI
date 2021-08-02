@@ -37,32 +37,13 @@
         var vm = this;
 
         vm.$onInit = onInit;
+        vm.user = user;
+        vm.facility = facility;
         vm.doDispense = doDispense;
         vm.filterList = filterList;
         vm.clients = clients.data;
         vm.cachedClients = clients.data;
-
-        /**
-         * @ngdoc property
-         * @propertyOf cmis-view.controller:CmisViewController
-         * @name user
-         * @type {Object}
-         *
-         * @description
-         * User object to be created/updated.
-         */
-        vm.user = undefined;
-
-        /**
-         * @ngdoc property
-         * @propertyOf cmis-view.controller:CmisViewController
-         * @name facility
-         * @type {Object}
-         *
-         * @description
-         * Holds user's home facility.
-         */
-        vm.facility = undefined;
+        vm.maxDate = new Date();
 
         /**
          * @ngdoc method
@@ -73,8 +54,7 @@
          * Initialization method of the CmisViewController.
          */
         function onInit() {
-            vm.user = user;
-            vm.facility = facility;
+            vm.date = new Date();
         }
 
         /**
@@ -95,6 +75,10 @@
             } else if (vm.patientId) {
                 vm.clients = $filter('filter')(vm.clients, {
                     patient_id: vm.patientId
+                });
+            } else if (vm.date) {
+                vm.clients = $filter('filter')(vm.clients, {
+                    date: vm.date
                 });
             }
         }
