@@ -73,6 +73,8 @@
         }
 
         function refreshMedicationData(medication) {
+            calculateQuantity(medication);
+
             if (!medication.selectedOrderable) {
                 cleanErrors(medication);
                 medication.balance = null;
@@ -98,6 +100,7 @@
 
         function cleanMedicationData(medication) {
             cleanErrors(medication);
+            calculateQuantity(medication);
             medication.selectedOrderable = null;
             medication.orderables = null;
             medication.balance = null;
@@ -119,22 +122,16 @@
             var dose = parseInt(medication.dose, 10);
             var duration = parseInt(medication.duration, 10);
             var intervalType = INTERVAL.type[medication.interval];
-            var quantity = 0;
 
             if (intervalType === INTERVAL.type.wd) {
                 var weeklyDays = CmisIntervalService.countWeeklyDays(duration);
-
-                quantity = (dose * weeklyDays);
-
-                return quantity;
-            }
-            if (intervalType === INTERVAL.type.pm) {
+                medication.quantity = (dose * weeklyDays);
+            } else if (intervalType === INTERVAL.type.pm) {
                 medication.hasOwnInterval = true;
-                quantity = (dose * duration * medication.ownInterval);
-                return quantity;
+                medication.quantity = (dose * duration * medication.ownInterval);
+            } else {
+                medication.quantity = (dose * duration * intervalType);
             }
-            quantity = (dose * duration * intervalType);
-            return quantity;
         }
 
         function removeProductWhenSubstitue(medication) {
