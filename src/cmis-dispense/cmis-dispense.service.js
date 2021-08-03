@@ -83,8 +83,6 @@
             }
 
             if (medication.selectedOrderable.stockOnHand) {
-                // medication.$errors.noStockOnHand = null;
-                // medication.$errors.noOrderable = null;
                 calculateBalance(medication);
             } else {
                 medication.$errors.noStockOnHand = 'Product doesn\'t have Stock on hand.';
