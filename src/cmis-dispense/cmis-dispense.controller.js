@@ -38,7 +38,6 @@
         '$filter',
         '$q',
         'alertService',
-        'INTERVAL',
         'srcDstAssignments',
         '$scope',
         'messageService',
@@ -55,7 +54,7 @@
         'UNPACK_REASONS',
         'reasons',
         'dateUtils',
-        'CmisIntervalService'
+        'CmisDispenseService'
     ];
 
     function CmisDispenseController(
@@ -70,7 +69,6 @@
         $filter,
         $q,
         alertService,
-        INTERVAL,
         srcDstAssignments,
         $scope,
         messageService,
@@ -87,7 +85,7 @@
         UNPACK_REASONS,
         reasons,
         dateUtils,
-        CmisIntervalService
+        CmisDispenseService
 
     ) {
         var vm = this;
@@ -99,25 +97,32 @@
         vm.visitId = $stateParams.visitId;
         vm.user = user;
         vm.facility = facility;
-        vm.program = program;
+        vm.programs = facility.supportedPrograms;
+        vm.selectedProgram = program;
         vm.visit = visit.data;
+        vm.adjustmentType = adjustmentType;
         vm.substituteTab = [];
-        vm.orderableGroup = orderableGroup;
+        vm.orderableGroup = orderableGroup.data;
         vm.selectedSubstitutes = [];
         vm.addedLineItems = [];
         vm.srcDstAssignments = srcDstAssignments;
         vm.reasons = reasons;
         vm.selectedMedications = [];
-
+        vm.orderableGroupIndex = 0;
         vm.date = '';
         vm.reason = '';
         vm.notes = '';
 
-        // vm.addSubstitute = addSubstitute;
         vm.save = save;
         vm.addOrRemoveMedication = addOrRemoveMedication;
         vm.addOrRemoveSubstitute = addOrRemoveSubstitute;
-        vm.calculateQuantity = calculateQuantity;
+        vm.updateOrderableIndex = updateOrderableIndex;
+
+        vm.removeProductWhenSubstitue = CmisDispenseService.removeProductWhenSubstitue;
+        vm.showSoHorError = CmisDispenseService.showSoHorError;
+        vm.refreshMedicationData = CmisDispenseService.refreshMedicationData;
+        vm.calculateQuantity = CmisDispenseService.calculateQuantity;
+        vm.showBalance = CmisDispenseService.showBalance;
 
         /**
          * @ngdoc method
@@ -128,44 +133,74 @@
          * Initialization method of the CmisDispenseController.
          */
         function onInit() {
+            updateOrderableIndex();
             CmisRequestService.saveOath2Token();
             vm.date = $filter('isoDate')(new Date());
-            findSrcDesination();
+            findSrcDestination();
         }
 
-        function findSrcDesination() {
+        function findSrcDestination() {
             vm.srcDstAssignments = $filter('filter')(vm.srcDstAssignments, {
                 name: 'F.E. Patient'
             });
         }
 
         function addOrRemoveMedication(medication) {
+            medication.$errors = {};
+            CmisDispenseService.cleanErrors(medication);
 
-            var orderable = getOrderableByProductCode(medication.code);
+            var orderables = getOrderablesByGenericName(medication.drug_name);
 
-            if (!orderable && medication.$selected) {
-                medication.$errors = {};
+            if (orderables.length === 0 && medication.$selected) {
                 medication.$errors.noOrderable = 'No product found';
                 return;
             }
 
             if (medication.$selected) {
-                medication.orderable = orderable[0][0];
-                medication.quantity = calculateQuantity(medication);
-                // medication.orderable.quantity = medication.quantity;
-                medication.balance = medication.orderable.stockOnHand - medication.quantity;
+                if (orderables.length === 1) {
+                    medication.selectedOrderable = orderables[0];
+                }
+                medication.orderables = orderables;
+                CmisDispenseService.refreshMedicationData(medication);
+
             } else {
-                medication.$errors = null;
-                medication.orderable = null;
-                medication.quantity = null;
-                medication.balance = null;
-                medication.substitute = null;
+                CmisDispenseService.cleanMedicationData(medication);
             }
+        }
+
+        function getOrderablesByGenericName(productName) {
+            var orderables = null;
+            if (productName) {
+                orderables = findOrderables(productName);
+                if (orderables === null || orderables.length === 0) {
+                    return findOrderables(productName.substring(0, 5));
+                }
+            }
+            return orderables;
+        }
+
+        function findOrderables(productName) {
+            var orderable = [];
+            vm.orderableGroup.forEach(function(group) {
+                group.orderableGroup.forEach(function(orderables) {
+                    var tempOrderable = $filter('filter')(orderables, {
+                        orderable: {
+                            fullProductName: productName
+                        }
+                    });
+                    if (tempOrderable.length > 0) {
+                        tempOrderable[0].program = group.program;
+                        orderable.push(tempOrderable[0]);
+                    }
+                });
+            });
+            return orderable;
         }
 
         function addOrRemoveSubstitute(orderable) {
 
             if (orderable.$selected) {
+                orderable.program = vm.selectedProgram;
                 vm.selectedSubstitutes.push(orderable);
             } else {
                 var index = vm.selectedSubstitutes.indexOf(orderable);
@@ -173,17 +208,6 @@
                 deleteSubstituteFromMedications(orderable);
                 orderable.quantity = null;
                 orderable.$errors = {};
-            }
-        }
-
-        function getOrderableByProductCode(productCode) {
-
-            if (productCode) {
-                return $filter('filter')(vm.orderableGroup, {
-                    orderable: {
-                        productCode: productCode
-                    }
-                });
             }
         }
 
@@ -203,7 +227,21 @@
 
             // generateKitConstituentLineItem(addedLineItems);
 
-            stockAdjustmentCreationService.submitAdjustments(program.id, facility.id, addedLineItems, adjustmentType)
+            vm.programs.forEach(function(program) {
+                var lineItems = $filter('filter')(addedLineItems, {
+                    program: {
+                        id: program.id
+                    }
+                });
+                if (lineItems.length > 0) {
+                    submit(program, lineItems);
+                }
+            });
+        }
+
+        function submit(program, addedLineItems) {
+            stockAdjustmentCreationService
+                .submitAdjustments(program.id, vm.facility.id, addedLineItems, vm.adjustmentType)
                 .then(function() {
                     if (offlineService.isOffline()) {
                         notificationService.offline(vm.key('submittedOffline'));
@@ -220,7 +258,6 @@
         function validateData() {
 
             if (!validateMedicationDuplicates()) {
-                // TODO add in messages
                 alertService.error('Medications must have different substitutes!');
                 return false;
             }
@@ -304,14 +341,27 @@
                             success = false;
                             return;
                         }
-                        orderable = medication.orderable;
+
+                        if (medication.$errors.noStockOnHand === 'Product does\'nt have Stock on hand.') {
+                            alertService.error('You can not dispense medication without Stock on hand.');
+                            success = false;
+                            return;
+                        }
+
+                        if (medication.$errors.balanceBelowZero === 'Balance below zero') {
+                            alertService.error('Balance can\'t be below zero.');
+                            success = false;
+                            return;
+                        }
+
+                        orderable = medication.selectedOrderable;
                         orderable.quantity = medication.quantity;
                     }
 
                     orderable.$errors = {};
                     orderable.$previewSOH = orderable.stockOnHand;
                     orderable.assignment = vm.srcDstAssignments[0];
-                    orderable.reason = (adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
+                    orderable.reason = (vm.adjustmentType.state === ADJUSTMENT_TYPE.KIT_UNPACK.state)
                         ? {
                             id: UNPACK_REASONS.KIT_UNPACK_REASON_ID
                         } : vm.reasons[0];
@@ -386,7 +436,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateQuantity
          *
          * @description
@@ -411,7 +461,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateAssignment
          *
          * @description
@@ -420,8 +470,8 @@
          * @param {Object} lineItem line item to be validated.
          */
         vm.validateAssignment = function(lineItem) {
-            if (adjustmentType.state !== ADJUSTMENT_TYPE.ADJUSTMENT.state &&
-                adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
+            if (vm.adjustmentType.state !== ADJUSTMENT_TYPE.ADJUSTMENT.state &&
+                vm.adjustmentType.state !== ADJUSTMENT_TYPE.KIT_UNPACK.state) {
                 lineItem.$errors.assignmentInvalid = isEmpty(lineItem.assignment);
             }
             return lineItem;
@@ -429,7 +479,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateReason
          *
          * @description
@@ -438,7 +488,7 @@
          * @param {Object} lineItem line item to be validated.
          */
         vm.validateReason = function(lineItem) {
-            if (adjustmentType.state === 'adjustment') {
+            if (vm.adjustmentType.state === 'adjustment') {
                 lineItem.$errors.reasonInvalid = isEmpty(lineItem.reason);
             }
             return lineItem;
@@ -446,7 +496,7 @@
 
         /**
          * @ngdoc method
-         * @methodOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @methodOf cmis-dispense.controller:CmisDispenseController
          * @name validateDate
          *
          * @description
@@ -461,7 +511,7 @@
 
         /**
          * @ngdoc property
-         * @propertyOf stock-adjustment-creation.controller:StockAdjustmentCreationController
+         * @propertyOf cmis-dispense.controller:CmisDispenseController
          * @name offline
          * @type {boolean}
          *
@@ -470,31 +520,29 @@
          */
         vm.offline = offlineService.isOffline;
 
-        vm.key = function(secondaryKey) {
-            return adjustmentType.prefix + 'Creation.' + secondaryKey;
-        };
-
-        function calculateQuantity(medication) {
-            var dose = parseInt(medication.dose, 10);
-            var duration = parseInt(medication.duration, 10);
-            var intervalType = INTERVAL.type[medication.interval];
-            var quantity = 0;
-
-            if (intervalType === INTERVAL.type.wd) {
-                var weeklyDays = CmisIntervalService.countWeeklyDays(duration);
-
-                quantity = (dose * weeklyDays);
-
-                return quantity;
-            }
-            if (intervalType === INTERVAL.type.pm) {
-                medication.hasOwnInterval = true;
-                quantity = (dose * duration * medication.ownInterval);
-                return quantity;
-            }
-            quantity = (dose * duration * intervalType);
-            return quantity;
+        /**
+         * @ngdoc method
+         * @methodOf cmis-dispense.controller:CmisDispenseController
+         * @name updateOrderableIndex
+         *
+         * @description
+         * Validate line item occurred date and returns self.
+         *
+         * @param {Object} lineItem line item to be validated.
+         */
+        function updateOrderableIndex() {
+            loadingModalService.open();
+            vm.orderableGroup.forEach(function(group, index) {
+                if (group.program.id === vm.selectedProgram.id) {
+                    vm.orderableGroupIndex = index;
+                }
+            });
+            loadingModalService.close();
         }
+
+        vm.key = function(secondaryKey) {
+            return vm.adjustmentType.prefix + 'Creation.' + secondaryKey;
+        };
 
         function save() {
 
@@ -514,6 +562,7 @@
 
             confirmService.confirm(confirmMessage, vm.key('confirm')).then(function() {
                 loadingModalService.open();
+
                 $q.resolve(
                     CmisRequestService.putRequest(
                         '/prescription/client/dispense',
@@ -522,11 +571,17 @@
                         }
                     )
                 ).then(function(cmisResponse) {
-                    notificationService.success('Succesfully dispensed! Response: ' + cmisResponse);
+
+                    if (cmisResponse.status === 200) {
+                        notificationService.success('Succesfully dispensed! Response: ' + cmisResponse.data);
+                        submitToStock();
+                    } else {
+                        notificationService.error('There was an error while dispensing. Error: ' + cmisResponse.data);
+                    }
 
                 })
                     .then(function() {
-                        submitToStock();
+                        loadingModalService.close();
                     });
             });
         }

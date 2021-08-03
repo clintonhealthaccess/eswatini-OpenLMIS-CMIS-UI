@@ -97,7 +97,7 @@
             dataPromise = $http
                 .put(cmisUrlFactory(url), data)
                 .then(function(response) {
-                    return response.data;
+                    return response;
                 })
                 .catch(function() {
                     return $q.reject();

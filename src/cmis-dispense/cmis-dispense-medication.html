@@ -7,6 +7,8 @@
             <tr>
                 <th></th>
                 <th>{{'cmisDispense.name' | message}}</th>
+                <th>{{'cmisDispense.olmisName' | message}}</th>
+                <th>{{'cmisDispense.program' | message}}</th>
                 <th>{{'cmisDispense.dose' | message}}</th>
                 <th>{{'cmisDispense.duration' | message}}</th>
                 <th>{{'cmisDispense.interval' | message}}</th>
@@ -25,6 +27,14 @@
                         ng-change="vm.addOrRemoveMedication(medication)"/>
                 </td>
                 <td>{{medication.drug_name}}</td>
+                <td>
+                    <select ng-disabled="!medication.$selected || medication.substitute"
+                            ng-model="medication.selectedOrderable"
+                            ng-change="vm.refreshMedicationData(medication)"
+                            ng-options="option.orderable.productCode + ' - ' + option.orderable.fullProductName for option in medication.orderables">
+                    </select>
+                </td>
+                <td>{{medication.selectedOrderable.program.name}}</td>
                 <td>{{medication.dose}}</td>
                 <td>{{medication.duration}}</td>
                 <td>
@@ -38,17 +48,31 @@
                             ng-disabled="!medication.$selected"
                             ng-model="medication.ownInterval"
                             ng-init="medication.ownInterval=0"
+                            ng-change="vm.refreshMedicationData(medication)"
                             min="0"
                             step="1"
                             style="width: 15%;">
                     </div>
                 </td>
-                <td openlmis-invalid="{{medication.$errors.noOrderable ? 'openlmisForm.required' : '' | message}}">{{ (medication.$errors.noOrderable) ? medication.$errors.noOrderable : medication.orderable.stockOnHand}}</td>
-                <td>{{medication.balance}}</td>
-                <td>{{medication.quantity=vm.calculateQuantity(medication)}}</td>
+                <td openlmis-invalid="{{medication.$errors.noOrderable || medication.$errors.noStockOnHand ? 'openlmisForm.formInvalid' : '' | message}}">
+                    {{ vm.showSoHorError(medication) }}
+                </td>
+                <td openlmis-invalid="{{medication.$errors.balanceBelowZero ? 'openlmisForm.formInvalid' : '' | message}}">
+                    {{vm.showBalance(medication)}}
+                </td>
+                <td>
+                    <input
+                            type="number"
+                            ng-disabled="!medication.$selected"
+                            ng-model="medication.quantity"
+                            ng-init="vm.calculateQuantity(medication)"
+                            min="0"
+                            step="1"
+                            style="width: 15%;">
                 <td>
                     <select ng-disabled="!medication.$selected"
                         ng-model="medication.substitute"
+                        ng-change="vm.removeProductWhenSubstitue(medication)"
                         ng-options="option.orderable.fullProductName for option in vm.selectedSubstitutes">
                     </select>
                 </td>
@@ -56,6 +80,15 @@
         </tbody>
     </table>
 </section>
+
+<fieldset class="form-group">
+    <label for="selectedProgram">{{'cmisDispense.program' | message}}</label>
+    <select
+            ng-model="vm.selectedProgram"
+            ng-change="vm.updateOrderableIndex()"
+            ng-options="program.name for program in vm.programs">
+    </select>
+</fieldset>
 
 <h2>{{'cmisDispense.substitute' | message}}</h2>
 <section class="openlmis-table-container cmis-view">
@@ -71,7 +104,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="groups in vm.orderableGroup">
+            <tr ng-repeat="groups in vm.orderableGroup[vm.orderableGroupIndex].orderableGroup">
                 <td>{{groups[0].orderable.fullProductName}}</td>
                 <td>
                     <input
@@ -80,6 +113,7 @@
                         ng-disabled="!groups[0].$selected"
                         max="{{groups[0].stockOnHand}}"
                         step="1"
+                        ng-change="{{ groups[0].$errors.quantityInvalid = null}}"
                         openlmis-invalid="{{groups[0].$errors.quantityInvalid ? 'openlmisForm.required' : '' | message}}"
                         ng-model="groups[0].quantity"/>
                 </td>
