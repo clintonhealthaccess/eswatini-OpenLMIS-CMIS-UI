@@ -32,22 +32,22 @@
 
     function supersetReports(SUPERSET_URL) {
         var reports = {};
-        if (true) {
+        if (SUPERSET_URL.substr(0, 2) !== '${') {
             reports = {
                 PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                    'http://34.207.216.185:9000/superset/dashboard/3/',
+                    SUPERSET_URL + '/superset/dashboard/3/',
                     ''),
                 PRODUCT_STOCKOUT: createReport('productStockout',
-                    'http://34.207.216.185:9000/superset/dashboard/2/',
+                    SUPERSET_URL + '/superset/dashboard/2/',
                     ''),
                 INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                    'http://34.207.216.185:9000/superset/dashboard/5/',
+                    SUPERSET_URL + '/superset/dashboard/5/',
                     ''),
                 ORDER_FILL_RATE: createReport('OrderFillRate',
-                    'http://34.207.216.185:9000/superset/dashboard/4/',
+                    SUPERSET_URL + '/superset/dashboard/4/',
                     ''),
                 ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                    'http://34.207.216.185:9000/superset/dashboard/1/',
+                    SUPERSET_URL + '/superset/dashboard/1/',
                     '')
             };
         }
