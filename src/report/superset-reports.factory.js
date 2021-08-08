@@ -33,22 +33,22 @@
 
         reports = {
             PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/3/',
+                'http://35.171.194.94/superset/dashboard/3/',
                 ''),
             PRODUCT_STOCKOUT: createReport('productStockout',
-                'http://34.207.216.185:9000/superset/dashboard/2/',
+                'http://35.171.194.94/superset/dashboard/2/',
                 ''),
             INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/5/',
+                'http://35.171.194.94/superset/dashboard/5/',
                 ''),
             ORDER_FILL_RATE: createReport('OrderFillRate',
-                'http://34.207.216.185:9000/superset/dashboard/4/',
+                'http://35.171.194.94/superset/dashboard/4/',
                 ''),
             ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                'http://34.207.216.185:9000/superset/dashboard/1/',
+                'http://35.171.194.94/superset/dashboard/1/',
                 ''),
             MEDICATION_COST: createReport('medicationCost',
-                'http://34.207.216.185:9000/superset/dashboard/6/',
+                'http://35.171.194.94/superset/dashboard/6/',
                 '')
         };
 
