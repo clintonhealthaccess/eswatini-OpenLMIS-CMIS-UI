@@ -35,19 +35,19 @@
         if (SUPERSET_URL.substr(0, 2) !== '${') {
             reports = {
                 PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                    SUPERSET_URL + '/superset/dashboard/3/',
+                    SUPERSET_URL + '/superset/dashboard/product-status/',
                     ''),
                 PRODUCT_STOCKOUT: createReport('productStockout',
-                    SUPERSET_URL + '/superset/dashboard/2/',
+                    SUPERSET_URL + '/superset/dashboard/product-stockout/',
                     ''),
                 INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                    SUPERSET_URL + '/superset/dashboard/5/',
+                    SUPERSET_URL + '/superset/dashboard/inventory-report/',
                     ''),
                 ORDER_FILL_RATE: createReport('OrderFillRate',
-                    SUPERSET_URL + '/superset/dashboard/4/',
+                    SUPERSET_URL + '/superset/dashboard/order-fill-rate/',
                     ''),
                 ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                    SUPERSET_URL + '/superset/dashboard/1/',
+                    SUPERSET_URL + '/superset/dashboard/adjustment-summary/',
                     '')
             };
         }
