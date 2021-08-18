@@ -34,6 +34,13 @@
     "report.superset.inventoryReportByFacility": "Inventory Report by Facility Dashboard",
     "report.superset.OrderFillRate": "Order Fill Rate Dashboard",
     "report.superset.AdjustmentSummary": "Adjustment Summary Dashboard",
-    "report.superset.medicationCost": "Medication Cost Dashboard"
+    "report.superset.DispensedProductsSummary": "Dispensed Products Summary",
+    "report.superset.ReportingRate": "Reporting Rate",
+    "report.superset.MedicationCosts": "Medication Costs",
+    "report.superset.NonReportingFacilities": "Non Reporting Facilities",
+    "report.superset.OrderedQuantities": "Ordered Quantities",
+    "report.superset.ConsumptionReport": "Consumption Report - dispensed to patients",
+    "report.superset.OutstandingOrders": "Outstanding Orders",
+    "report.superset.ExceptionReport": "Exception Report"
 
 }
