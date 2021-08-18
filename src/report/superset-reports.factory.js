@@ -35,19 +35,19 @@
         if (SUPERSET_URL.substr(0, 2) !== '${') {
             reports = {
                 PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                    SUPERSET_URL + '/superset/dashboard/product-status/',
+                    SUPERSET_URL + '/superset/dashboard/productStatusByFacility/',
                     ''),
                 PRODUCT_STOCKOUT: createReport('productStockout',
-                    SUPERSET_URL + '/superset/dashboard/product-stockout/',
+                    SUPERSET_URL + '/superset/dashboard/productStockout/',
                     ''),
                 INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                    SUPERSET_URL + '/superset/dashboard/inventory-report/',
+                    SUPERSET_URL + '/superset/dashboard/inventoryReportByFacility/',
                     ''),
                 ORDER_FILL_RATE: createReport('OrderFillRate',
-                    SUPERSET_URL + '/superset/dashboard/order-fill-rate/',
+                    SUPERSET_URL + '/superset/dashboard/OrderFillRate/',
                     ''),
                 ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                    SUPERSET_URL + '/superset/dashboard/adjustment-summary/',
+                    SUPERSET_URL + '/superset/dashboard/AdjustmentSummary/',
                     ''),
                 DISPENSED_PRODUCTS_SUMMARY: createReport('DispensedProductsSummary',
                     SUPERSET_URL + '/superset/dashboard/dispensedProductsSummary/',
@@ -69,6 +69,9 @@
                     ''),
                 OUTSTANDING_ORDERS: createReport('OutstandingOrders',
                     SUPERSET_URL + '/superset/dashboard/outstandingOrders/',
+                    ''),
+                EXCEPTION_REPORT: createReport('ExceptionReport',
+                    SUPERSET_URL + '/superset/dashboard/ExceptionReport/',
                     '')
             };
         }
