@@ -44,10 +44,10 @@
                     SUPERSET_URL + '/superset/dashboard/inventoryReportByFacility/',
                     ''),
                 ORDER_FILL_RATE: createReport('OrderFillRate',
-                    SUPERSET_URL + '/superset/dashboard/OrderFillRate/',
+                    SUPERSET_URL + '/superset/dashboard/orderFillRate/',
                     ''),
                 ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                    SUPERSET_URL + '/superset/dashboard/AdjustmentSummary/',
+                    SUPERSET_URL + '/superset/dashboard/adjustmentSummary/',
                     ''),
                 DISPENSED_PRODUCTS_SUMMARY: createReport('DispensedProductsSummary',
                     SUPERSET_URL + '/superset/dashboard/dispensedProductsSummary/',
@@ -71,7 +71,7 @@
                     SUPERSET_URL + '/superset/dashboard/outstandingOrders/',
                     ''),
                 EXCEPTION_REPORT: createReport('ExceptionReport',
-                    SUPERSET_URL + '/superset/dashboard/ExceptionReport/',
+                    SUPERSET_URL + '/superset/dashboard/exceptionReport/',
                     '')
             };
         }
