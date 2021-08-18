@@ -28,30 +28,53 @@
         .module('report')
         .factory('supersetReports', supersetReports);
 
-    function supersetReports() {
+    supersetReports.$inject = ['SUPERSET_URL'];
+
+    function supersetReports(SUPERSET_URL) {
         var reports = {};
-
-        reports = {
-            PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/3/',
-                ''),
-            PRODUCT_STOCKOUT: createReport('productStockout',
-                'http://34.207.216.185:9000/superset/dashboard/2/',
-                ''),
-            INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
-                'http://34.207.216.185:9000/superset/dashboard/5/',
-                ''),
-            ORDER_FILL_RATE: createReport('OrderFillRate',
-                'http://34.207.216.185:9000/superset/dashboard/4/',
-                ''),
-            ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
-                'http://34.207.216.185:9000/superset/dashboard/1/',
-                ''),
-            MEDICATION_COST: createReport('medicationCost',
-                'http://34.207.216.185:9000/superset/dashboard/6/',
-                '')
-        };
-
+        if (SUPERSET_URL.substr(0, 2) !== '${') {
+            reports = {
+                PRODUCT_STATUS_BY_FACILITY: createReport('productStatusByFacility',
+                    SUPERSET_URL + '/superset/dashboard/productStatusByFacility/',
+                    ''),
+                PRODUCT_STOCKOUT: createReport('productStockout',
+                    SUPERSET_URL + '/superset/dashboard/productStockout/',
+                    ''),
+                INVENTORY_REPORT_BY_FACILITY: createReport('inventoryReportByFacility',
+                    SUPERSET_URL + '/superset/dashboard/inventoryReportByFacility/',
+                    ''),
+                ORDER_FILL_RATE: createReport('OrderFillRate',
+                    SUPERSET_URL + '/superset/dashboard/orderFillRate/',
+                    ''),
+                ADJUSTMENT_SUMMARY: createReport('AdjustmentSummary',
+                    SUPERSET_URL + '/superset/dashboard/adjustmentSummary/',
+                    ''),
+                DISPENSED_PRODUCTS_SUMMARY: createReport('DispensedProductsSummary',
+                    SUPERSET_URL + '/superset/dashboard/dispensedProductsSummary/',
+                    ''),
+                REPORTING_RATE: createReport('ReportingRate',
+                    SUPERSET_URL + '/superset/dashboard/reportingRate/',
+                    ''),
+                MEDICATION_COSTS: createReport('MedicationCosts',
+                    SUPERSET_URL + '/superset/dashboard/medicationCosts/',
+                    ''),
+                NON_REPORTING_FACILITIES: createReport('NonReportingFacilities',
+                    SUPERSET_URL + '/superset/dashboard/nonReportingFacilities/',
+                    ''),
+                ORDERED_QUANTITIES: createReport('OrderedQuantities',
+                    SUPERSET_URL + '/superset/dashboard/orderedQuantities/',
+                    ''),
+                CONSUMPTION_REPORT: createReport('ConsumptionReport',
+                    SUPERSET_URL + '/superset/dashboard/consumptionReport/',
+                    ''),
+                OUTSTANDING_ORDERS: createReport('OutstandingOrders',
+                    SUPERSET_URL + '/superset/dashboard/outstandingOrders/',
+                    ''),
+                EXCEPTION_REPORT: createReport('ExceptionReport',
+                    SUPERSET_URL + '/superset/dashboard/exceptionReport/',
+                    '')
+            };
+        }
         return {
             getReports: getReports,
             addReporingPages: addReporingPages
@@ -92,7 +115,8 @@
                     },
                     reportCode: function() {
                         return report.code;
-                    }
+                    },
+                    authorizationInSuperset: authorizeInSuperset
                 }
             });
         }
@@ -107,6 +131,26 @@
                 url: url + '?standalone=true',
                 right: right
             };
+        }
+
+        function authorizeInSuperset(loadingModalService, openlmisModalService, $q, $state, MODAL_CANCELLED) {
+            loadingModalService.close();
+            var dialog = openlmisModalService.createDialog({
+                backdrop: 'static',
+                keyboard: false,
+                controller: 'SupersetOAuthLoginController',
+                controllerAs: 'vm',
+                templateUrl: 'report/superset-oauth-login.html',
+                show: true
+            });
+            return dialog.promise
+                .catch(function(reason) {
+                    if (reason === MODAL_CANCELLED) {
+                        $state.go('openlmis.reports.list');
+                        return $q.resolve();
+                    }
+                    return $q.reject();
+                });
         }
     }
 
