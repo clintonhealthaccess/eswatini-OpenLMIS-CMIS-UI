@@ -8,6 +8,7 @@
     "cmisDispense.visitId": "Visit ID",
     "cmisDispense.medications": "Medications",
     "cmisDispense.name": "Name",
+    "cmisDispense.olmisName": "OLMIS Name",
     "cmisDispense.dose": "Dose",
     "cmisDispense.duration": "Duration/Days",
     "cmisDispense.substitute": "Substitute",
