@@ -50,7 +50,7 @@
      * @return {String}     cmis URL
      */
         return function(url) {
-            return 'http://10.120.1.150:8097/PrescriptionService.svc' + url;
+            return 'http://10.255.67.130:8093/PrescriptionService.svc' + url;
         };
     }
 })();
