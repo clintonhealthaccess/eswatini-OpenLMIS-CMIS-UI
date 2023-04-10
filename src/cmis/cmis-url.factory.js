@@ -50,7 +50,8 @@
      * @return {String}     cmis URL
      */
         return function(url) {
-            return 'http://10.255.67.130:8093/PrescriptionService.svc' + url;
+            /*return 'http://10.255.67.130:8093/PrescriptionService.svc' + url;*/
+            return 'https://elmis.eswatinimedicalstores.org:4433/cmis/v1/PrescriptionService.svc' + url;
         };
     }
 })();
