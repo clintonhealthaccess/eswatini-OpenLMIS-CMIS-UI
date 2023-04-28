@@ -110,7 +110,7 @@
          */
         function doDispense(visitId) {
 
-            $state.go('openlmis.cmis.dispense', {
+            $state.go('openlmis.cmis.dispense-v1', {
                 visitId: visitId
             });
         }
