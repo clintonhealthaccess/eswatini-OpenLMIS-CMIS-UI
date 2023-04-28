@@ -12,8 +12,8 @@
  * the GNU Affero General Public License along with this program. If not, see
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org. 
  */
-/* eslint-disable camelcase */
-(function() {
+/* eslint-disable */
+(function () {
     'use strict';
 
     /**
@@ -36,6 +36,7 @@
         this.oauth2AuthorizationCall = oauth2AuthorizationCall;
         this.isUserAuthorized = isUserAuthorized;
         this.cmisMedicationBilder = cmisMedicationBilder;
+        this.postLMISRequest = doPostLMIS;
 
         /**
          *
@@ -51,13 +52,30 @@
                     cmisUrlFactory(url),
                     data
                 ).defaults.headers.common.Authentication = authHeader
-                    .then(function(response) {
+                    .then(function (response) {
                         return response.data;
                     })
-                    .catch(function() {
+                    .catch(function () {
                         return $q.reject();
                     });
             }
+            return dataPromise;
+        }
+
+        function doPostLMIS(url) {
+            var dataPromise = null;
+            var authHeader = buildRequestHeader();
+            // if (authHeader !== null) {
+            dataPromise = $http.get(
+                url
+            )
+                .then(function (response) {
+                    return response.data.body;
+                })
+                .catch(function () {
+                    return $q.reject();
+                });
+            //}
             return dataPromise;
         }
 
@@ -69,7 +87,7 @@
         function doGet(url) {
             var dataPromise = $http
                 .get(cmisUrlFactory(url))
-                .then(function(response) {
+                .then(function (response) {
                     if (
                         response.data.message ===
                         'Wrong parameters or prescription expired'
@@ -80,7 +98,7 @@
                     }
                     return response.data;
                 })
-                .catch(function() {
+                .catch(function () {
                     return $q.reject();
                 });
             return dataPromise;
@@ -96,10 +114,10 @@
             var dataPromise = null;
             dataPromise = $http
                 .put(cmisUrlFactory(url), data)
-                .then(function(response) {
+                .then(function (response) {
                     return response;
                 })
-                .catch(function() {
+                .catch(function () {
                     return $q.reject();
                 });
 
