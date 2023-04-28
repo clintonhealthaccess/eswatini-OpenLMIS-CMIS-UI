@@ -60,7 +60,7 @@ pipeline {
                                 docker-compose pull
                                 docker-compose down --volumes
                                 export COMPOSE_INTERACTIVE_NO_CLI=1
-                                docker-compose run --entrypoint /dev-ui/build.sh eswatini-cmis-ui
+                                docker-compose run --entrypoint ./build.sh eswatini-cmis-ui
                                 docker-compose build image
                                 docker-compose down --volumes
                                 sudo rm -rf node_modules/
