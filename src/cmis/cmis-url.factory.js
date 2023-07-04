@@ -51,7 +51,7 @@
      */
         return function(url) {
             /*return 'http://10.255.67.130:8093/PrescriptionService.svc' + url;*/
-            return 'https://102.222.132.153:4433/cmis/v1/PrescriptionService.svc' + url;
+            return 'http://102.222.132.153:4433/cmis/v1/PrescriptionService.svc' + url;
         };
     }
 })();
