@@ -224,6 +224,21 @@
                         if (!medication.$selected) {
                             return;
                         }
+                        if (null != medication.drug_name && null != medication.selectedOrderable && medication.drug_name.toLowerCase() !== medication.selectedOrderable.orderableName.toLowerCase()) {
+                            medicationJson = CmisRequestService.cmisMedicationBilderSubstitute(
+                                medication.medication_id,
+                                medication.quantity,
+                                vm.date,
+                                vm.reason,
+                                vm.notes,
+                                medication.selectedOrderable.oderableId,
+                                medication.selectedOrderable.orderableName
+
+                            );
+                            vm.selectedMedications.push(medicationJson);
+
+                        }
+                        else{
                         medicationJson = CmisRequestService.cmisMedicationBilder(
                             medication.medication_id,
                             medication.quantity,
@@ -232,6 +247,7 @@
                             vm.notes
                         );
                         vm.selectedMedications.push(medicationJson);
+                        }
 
                     }
                 );

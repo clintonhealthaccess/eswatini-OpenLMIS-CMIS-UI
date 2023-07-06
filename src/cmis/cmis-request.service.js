@@ -37,6 +37,7 @@
         this.isUserAuthorized = isUserAuthorized;
         this.cmisMedicationBilder = cmisMedicationBilder;
         this.postLMISRequest = doPostLMIS;
+        this.cmisMedicationBilderSubstitute = cmisMedicationBilderSubstitute;
 
         /**
          *
@@ -229,6 +230,19 @@
                 dispense_date: date,
                 dispense_zero_reason: reason,
                 dispense_notes: notes
+            };
+            return medicationJson;
+        }
+
+        function cmisMedicationBilderSubstitute(medication, quantity, date, reason, notes,subsitute_id,subsitute_name) {
+            var medicationJson = {
+                medication_id: medication,
+                dispense_quantity: String(quantity),
+                dispense_date: date,
+                dispense_zero_reason: reason,
+                dispense_notes: notes,
+                substitute_product_id:subsitute_id,
+                substitute_product_name:subsitute_name
             };
             return medicationJson;
         }
