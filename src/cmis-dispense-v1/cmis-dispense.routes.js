@@ -22,7 +22,7 @@
 
     routes.$inject = ['$stateProvider', 'ADJUSTMENT_TYPE'];
 
-    var MDESP_URL = process.env.MDESP_API_URL || 'http://34.207.216.185:8082';
+    var MDESP_URL = 'http://'+window.location.hostname+":8082";
 
     function routes($stateProvider, ADJUSTMENT_TYPE) {
         $stateProvider.state('openlmis.cmis.dispense-v1', {
