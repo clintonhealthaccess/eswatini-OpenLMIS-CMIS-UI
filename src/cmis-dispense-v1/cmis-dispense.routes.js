@@ -22,6 +22,8 @@
 
     routes.$inject = ['$stateProvider', 'ADJUSTMENT_TYPE'];
 
+    var MDESP_URL = process.env.MDESP_API_URL || 'http://34.207.216.185:8082';
+
     function routes($stateProvider, ADJUSTMENT_TYPE) {
         $stateProvider.state('openlmis.cmis.dispense-v1', {
             isOffline: true,
@@ -66,7 +68,7 @@
                     return $stateParams.visit;
                 },
                 orderables: function ($stateParams, CmisRequestService, facility) {
-                    return CmisRequestService.postLMISRequest('http://34.207.216.185:8082/api/lmis/fetchStockOnHand?facilityId=' + facility.id);
+                    return CmisRequestService.postLMISRequest(MDESP_URL+'/api/lmis/fetchStockOnHand?facilityId=' + facility.id);
                 },
                 adjustmentType: function () {
                     return ADJUSTMENT_TYPE.ISSUE;
