@@ -22,7 +22,7 @@
 
     routes.$inject = ['$stateProvider', 'ADJUSTMENT_TYPE'];
 
-    const locationURL = window.location.hostname;
+    var locationURL = window.location.hostname;
 
     var MDESP_URL = "";
 
