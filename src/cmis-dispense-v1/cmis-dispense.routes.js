@@ -22,7 +22,16 @@
 
     routes.$inject = ['$stateProvider', 'ADJUSTMENT_TYPE'];
 
-    var MDESP_URL = 'http://'+window.location.hostname+":8082";
+    const locationURL = window.location.hostname;
+
+    var MDESP_URL = "";
+
+    if(locationURL.includes("elmis") || locationURL.startsWith("102.")){
+        MDESP_URL = "https://elmis.eswatinimedicalstores.org:4433";
+    }
+    else{
+        MDESP_URL = 'http://'+locationURL+":8082";
+    }
 
     function routes($stateProvider, ADJUSTMENT_TYPE) {
         $stateProvider.state('openlmis.cmis.dispense-v1', {
