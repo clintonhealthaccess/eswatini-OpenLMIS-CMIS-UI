@@ -15,6 +15,7 @@
                 <th>{{'cmisDispense.stockOnHand' | message}}</th>
                 <th>{{'cmisDispense.balance' | message}}</th>
                 <th>{{'cmisDispense.dispenseQuantity' | message}}</th>
+                <th>{{'cmisDispense.substitute' | message}}</th>
                 <!-- <th>{{'cmisDispense.substitute' | message}}</th> -->
             </tr>
         </thead>
@@ -79,7 +80,9 @@
                             step="1"
                             style="width: 15%;">
                 </td>
-                
+                <td>
+                    <input type="checkbox" ng-model="medication.isSubstitue"/>
+                </td>
                 
                 
             </tr>

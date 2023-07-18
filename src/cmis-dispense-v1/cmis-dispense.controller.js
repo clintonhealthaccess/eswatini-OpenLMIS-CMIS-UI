@@ -224,14 +224,14 @@
                         if (!medication.$selected) {
                             return;
                         }
-                        if (null != medication.drug_name && null != medication.selectedOrderable && medication.drug_name.toLowerCase() !== medication.selectedOrderable.orderableName.toLowerCase()) {
+                        if (medication.isSubstitue) {
                             medicationJson = CmisRequestService.cmisMedicationBilderSubstitute(
                                 medication.medication_id,
                                 medication.quantity,
                                 vm.date,
                                 vm.reason,
                                 vm.notes,
-                                medication.selectedOrderable.oderableId,
+                                medication.selectedOrderable.productCode,
                                 medication.selectedOrderable.orderableName
 
                             );
